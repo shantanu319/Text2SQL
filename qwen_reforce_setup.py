@@ -9,6 +9,7 @@ from torch import nn
 import torch.nn.functional as F
 import zipfile
 import io
+import sqlite3
 
 def setup_qwen():
     model_name = "Qwen/Qwen-32B"
