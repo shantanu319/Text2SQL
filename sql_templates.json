@@ -1,0 +1,102 @@
+[
+  {
+    "instruction": "Generate a SQL query to find all employees who earn more than $50,000.",
+    "input": "Database has tables: employees(id, name, salary, department_id), departments(id, name, location)",
+    "output": "SELECT name FROM employees WHERE salary > 50000;"
+  },
+  {
+    "instruction": "Create a query to list the names of all customers who have placed an order in the last month.",
+    "input": "Database has tables: customers(id, name, email, address), orders(id, customer_id, order_date, total_amount)",
+    "output": "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.id = o.customer_id WHERE o.order_date >= DATE('now', '-1 month');"
+  },
+  {
+    "instruction": "Find the total revenue by product category.",
+    "input": "Database has tables: products(id, name, price, category_id), orders(id, customer_id, order_date), order_items(order_id, product_id, quantity), categories(id, name)",
+    "output": "SELECT c.name, SUM(p.price * oi.quantity) as total_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id GROUP BY c.name;"
+  },
+  {
+    "instruction": "List all books published after 2020 with their authors.",
+    "input": "Database has tables: books(id, title, publication_year, publisher_id), authors(id, name, country), book_authors(book_id, author_id)",
+    "output": "SELECT b.title, a.name FROM books b JOIN book_authors ba ON b.id = ba.book_id JOIN authors a ON ba.author_id = a.id WHERE b.publication_year > 2020;"
+  },
+  {
+    "instruction": "Get the average rating for each movie genre.",
+    "input": "Database has tables: movies(id, title, year, genre_id), ratings(id, movie_id, user_id, score), genres(id, name)",
+    "output": "SELECT g.name, AVG(r.score) as average_rating FROM genres g JOIN movies m ON g.id = m.genre_id JOIN ratings r ON m.id = r.movie_id GROUP BY g.name;"
+  },
+  {
+    "instruction": "Find students who have enrolled in all available courses.",
+    "input": "Database has tables: students(id, name, email), courses(id, name, department), enrollments(student_id, course_id, semester)",
+    "output": "SELECT s.name FROM students s WHERE NOT EXISTS (SELECT c.id FROM courses c WHERE NOT EXISTS (SELECT * FROM enrollments e WHERE e.student_id = s.id AND e.course_id = c.id));"
+  },
+  {
+    "instruction": "Get the top 5 products by sales quantity.",
+    "input": "Database has tables: products(id, name, price), sales(id, date, customer_id), sale_items(sale_id, product_id, quantity)",
+    "output": "SELECT p.name, SUM(si.quantity) as total_quantity FROM products p JOIN sale_items si ON p.id = si.product_id GROUP BY p.id ORDER BY total_quantity DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Find departments with more than 10 employees.",
+    "input": "Database has tables: employees(id, name, salary, department_id), departments(id, name, location)",
+    "output": "SELECT d.name, COUNT(*) as employee_count FROM departments d JOIN employees e ON d.id = e.department_id GROUP BY d.id HAVING COUNT(*) > 10;"
+  },
+  {
+    "instruction": "List all customers who have never placed an order.",
+    "input": "Database has tables: customers(id, name, email), orders(id, customer_id, order_date)",
+    "output": "SELECT c.name FROM customers c LEFT JOIN orders o ON c.id = o.customer_id WHERE o.id IS NULL;"
+  },
+  {
+    "instruction": "Find the most expensive product in each category.",
+    "input": "Database has tables: products(id, name, price, category_id), categories(id, name)",
+    "output": "SELECT c.name as category, p.name as product, p.price FROM products p JOIN categories c ON p.category_id = c.id WHERE p.price = (SELECT MAX(price) FROM products WHERE category_id = c.id);"
+  },
+  {
+    "instruction": "Get all employees who report to a specific manager.",
+    "input": "Database has tables: employees(id, name, manager_id, department_id)",
+    "output": "SELECT e.name FROM employees e WHERE e.manager_id = (SELECT id FROM employees WHERE name = 'John Smith');"
+  },
+  {
+    "instruction": "Find courses with no enrolled students.",
+    "input": "Database has tables: courses(id, name, department), enrollments(student_id, course_id, semester)",
+    "output": "SELECT c.name FROM courses c LEFT JOIN enrollments e ON c.id = e.course_id WHERE e.student_id IS NULL;"
+  },
+  {
+    "instruction": "List cities with the highest number of customers.",
+    "input": "Database has tables: customers(id, name, city_id), cities(id, name, country_id)",
+    "output": "SELECT ci.name, COUNT(*) as customer_count FROM cities ci JOIN customers cu ON ci.id = cu.city_id GROUP BY ci.id ORDER BY customer_count DESC;"
+  },
+  {
+    "instruction": "Calculate the average order amount by month.",
+    "input": "Database has tables: orders(id, customer_id, order_date, total_amount)",
+    "output": "SELECT strftime('%Y-%m', order_date) as month, AVG(total_amount) as average_amount FROM orders GROUP BY month ORDER BY month;"
+  },
+  {
+    "instruction": "Find products that have never been ordered.",
+    "input": "Database has tables: products(id, name, price), order_items(order_id, product_id, quantity)",
+    "output": "SELECT p.name FROM products p LEFT JOIN order_items oi ON p.id = oi.product_id WHERE oi.order_id IS NULL;"
+  },
+  {
+    "instruction": "Get the total sales amount for each salesperson.",
+    "input": "Database has tables: salespeople(id, name, region_id), sales(id, salesperson_id, amount, date)",
+    "output": "SELECT sp.name, SUM(s.amount) as total_sales FROM salespeople sp LEFT JOIN sales s ON sp.id = s.salesperson_id GROUP BY sp.id;"
+  },
+  {
+    "instruction": "Find customers who have purchased all products in a specific category.",
+    "input": "Database has tables: customers(id, name), products(id, name, category_id), orders(id, customer_id), order_items(order_id, product_id)",
+    "output": "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT p.id FROM products p WHERE p.category_id = 3 AND NOT EXISTS (SELECT oi.order_id FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE o.customer_id = c.id AND oi.product_id = p.id));"
+  },
+  {
+    "instruction": "Calculate the running total of expenses by date.",
+    "input": "Database has tables: expenses(id, amount, date, category)",
+    "output": "SELECT e1.date, SUM(e2.amount) as running_total FROM expenses e1 JOIN expenses e2 ON e2.date <= e1.date GROUP BY e1.date ORDER BY e1.date;"
+  },
+  {
+    "instruction": "Find employees who have the same salary.",
+    "input": "Database has tables: employees(id, name, salary, department_id)",
+    "output": "SELECT e1.name, e2.name, e1.salary FROM employees e1 JOIN employees e2 ON e1.salary = e2.salary WHERE e1.id < e2.id ORDER BY e1.salary;"
+  },
+  {
+    "instruction": "Get the second highest salary in the company.",
+    "input": "Database has tables: employees(id, name, salary, department_id)",
+    "output": "SELECT MAX(salary) FROM employees WHERE salary < (SELECT MAX(salary) FROM employees);"
+  }
+]
