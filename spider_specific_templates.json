@@ -1,0 +1,38 @@
+[
+    {
+        "nl_question": "Show all {columns} from {table} where {condition}",
+        "sql": "SELECT {columns} FROM {table} WHERE {condition};",
+        "schema_context": [
+            "{table}({columns})"
+        ],
+        "params": [
+            "columns",
+            "table",
+            "condition"
+        ]
+    },
+    {
+        "nl_question": "List {columns} from {table} ordered by {order_column} {direction}",
+        "sql": "SELECT {columns} FROM {table} ORDER BY {order_column} {direction};",
+        "notes": "Direction: ASC/DESC"
+    },
+    {
+        "nl_question": "Count total {entity} in {table}",
+        "sql": "SELECT COUNT({entity}) AS total_count FROM {table};"
+    },
+    {
+        "nl_question": "Show records from {table} between {start_date} and {end_date}",
+        "sql": "SELECT * FROM {table} WHERE {date_column} BETWEEN '{start_date}' AND '{end_date}';",
+        "constraints": [
+            "ISO date formatting"
+        ]
+    },
+    {
+        "nl_question": "Rank {subject} by {metric} in {table}",
+        "sql": "WITH ranked AS (SELECT *, ROW_NUMBER() OVER (ORDER BY {metric} DESC) AS rank FROM {table}) SELECT * FROM ranked WHERE rank <= {limit};"
+    },
+    {
+        "nl_question": "Find {columns} in {table1} that match {condition} in {table2}",
+        "sql": "SELECT {columns} FROM {table1} WHERE {key} IN (SELECT {key} FROM {table2} WHERE {condition});"
+    }
+]
