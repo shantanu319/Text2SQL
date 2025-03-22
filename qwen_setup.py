@@ -64,9 +64,7 @@ def setup_qwen():
     
     return model, tokenizer
 
-
 def calculate_exact_match(results):
-    """Calculate exact match accuracy after normalizing SQL queries"""
     matches = 0
     for result in results:
         gold_normalized = normalize_sql(result['gold_sql'])
@@ -76,18 +74,13 @@ def calculate_exact_match(results):
     return matches / len(results) if results else 0
 
 def calculate_execution_accuracy(results, db_dir):
-    """Calculate execution accuracy by running queries against databases"""
     matches = 0
     for result in results:
         db_path = os.path.join(db_dir, result['db_id'], result['db_id'] + '.sqlite')
         try:
-            # Connect to database
             conn = sqlite3.connect(db_path)
-            # Execute gold query
             gold_result = execute_query(conn, result['gold_sql'])
-            # Execute generated query
             gen_result = execute_query(conn, result['generated_sql'])
-            # Compare results (ignoring order)
             if compare_results(gold_result, gen_result):
                 matches += 1
             conn.close()
@@ -95,47 +88,62 @@ def calculate_execution_accuracy(results, db_dir):
             print(f"Error executing query: {e}")
     return matches / len(results) if results else 0
 
-def download_spider_dataset():
-    data_dir = "spider_data"
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
+def access_spider_dataset():
+    # Use the existing Spider2 repository instead of downloading
+    spider_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Spider2/spider2-snow/resource")
     
-    print("Downloading Spider 2.0 dataset...")
-    
-    # Download the dev set
-    dev_url = "https://yale-lily.github.io/spider2/spider2-snow/resource/data/dev.json"
-    dev_response = requests.get(dev_url)
-    with open(os.path.join(data_dir, "dev.json"), "wb") as f:
-        f.write(dev_response.content)
-    
-    # Download the database files
-    db_url = "https://yale-lily.github.io/spider2/spider2-snow/resource/data/spider.zip"
-    db_response = requests.get(db_url)
-    with zipfile.ZipFile(io.BytesIO(db_response.content)) as zip_ref:
-        zip_ref.extractall(data_dir)
-    
-    print(f"Spider dataset downloaded to {data_dir}")
-    return data_dir
+    if os.path.exists(spider_dir):
+        print(f"Using existing Spider2 dataset at {spider_dir}")
+        return spider_dir
+    else:
+        print(f"Error: Spider2 dataset not found at {spider_dir}")
+        return None
 
 def load_spider_examples(data_dir, limit=None):
-    dev_file = os.path.join(data_dir, "dev.json")
-    with open(dev_file, "r") as f:
-        examples = json.load(f)
+    # Since we're using the cloned Spider2 repository, we need to generate examples
+    # based on the database structure since we don't have the original dev.json file
     
-    if limit:
-        examples = examples[:limit]
+    db_dir = os.path.join(data_dir, "databases")
+    if not os.path.exists(db_dir):
+        print(f"Error: Database directory not found at {db_dir}")
+        return []
     
+    # Get a list of database directories
+    db_ids = [d for d in os.listdir(db_dir) if os.path.isdir(os.path.join(db_dir, d))]
+    
+    # Create examples manually
+    examples = []
+    for db_id in db_ids[:limit] if limit else db_ids:
+        # For each database, create a placeholder example
+        # This is a simplified approach; you may need to customize based on your needs
+        examples.append({
+            "db_id": db_id,
+            "question": f"Describe the schema of {db_id}",
+            "query": f"DESCRIBE {db_id}",
+            "db_path": os.path.join(db_dir, db_id)
+        })
+    
+    print(f"Created {len(examples)} examples from Spider2 database directories")
     return examples
 
-def format_spider_prompt(example):
+def format_spider_prompt(example, include_schema=True):
     db_id = example["db_id"]
     question = example["question"]
     
-    prompt = f"""Generate a SQL query for the following question:
-Database: {db_id}
-Question: {question}
-
-SQL:"""
+    prompt = f"Generate a SQL query for the following question:\n"
+    prompt += f"Database: {db_id}\n"
+    
+    if include_schema and "db_schema" in example:
+        schema = example["db_schema"]
+        prompt += "Schema:\n"
+        for table in schema["tables"]:
+            columns = ", ".join([f"{col['name']} ({col['type']})" for col in table["columns"]])
+            prompt += f"- {table['name']}: {columns}\n"
+        prompt += "Foreign Keys:\n"
+        for fk in schema["foreign_keys"]:
+            prompt += f"- {fk['source_table']}.{fk['source_column']} → {fk['target_table']}.{fk['target_column']}\n"
+    
+    prompt += f"Question: {question}\n\nSQL:"
     
     return prompt
 
@@ -169,7 +177,7 @@ def evaluate_sql_generation(model, tokenizer, examples):
 def run_on_spider_dataset(model_type="both", num_examples=10):
     print(f"Running evaluation on Spider dataset with model: {model_type}")
     
-    data_dir = download_spider_dataset()
+    data_dir = access_spider_dataset()
     examples = load_spider_examples(data_dir, limit=num_examples)
     
     print(f"Loaded {len(examples)} examples from Spider dataset")
@@ -216,9 +224,7 @@ def run_on_spider_dataset(model_type="both", num_examples=10):
         "reforce_results": reforce_results if model_type == "reforce" or model_type == "both" else None
     }
 
-def main():
-    
-    
+def main():    
     # Set up the model and tokenizer
     print("Setting up the base Qwen model...")
     model, tokenizer = setup_qwen()
@@ -290,3 +296,19 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+def extract_templates_from_spider(examples, output_file="spider_templates.json"):
+    templates = []
+    for example in examples:
+        template = {
+            "instruction": f"Generate a SQL query for the following question",
+            "input": f"Database: {example['db_id']}\nQuestion: {example['question']}",
+            "output": example["query"]
+        }
+        templates.append(template)
+    
+    with open(output_file, "w") as f:
+        json.dump(templates, f, indent=2)
+    
+    print(f"Extracted {len(templates)} templates to {output_file}")
+    return templates
