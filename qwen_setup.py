@@ -12,50 +12,41 @@ import sqlite3
 import re
 
 def setup_qwen():
-    model_name = "gpt2"  # Use a small model that will definitely work locally
+    model_name = "Qwen/QwQ-32B"  # load model
     
-    tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-    
-    # Ensure pad token is set
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
+    # Check if CUDA is available and set device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Using device: {device}")
+    
+    # Load model with appropriate configurations
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map="auto",
-        trust_remote_code=True
-    )
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+        low_cpu_mem_usage=True
+    ).to(device)
     
     return model, tokenizer
 
 def tokenize_function(examples, tokenizer, max_length=512):
-    """
-    Tokenize the examples for fine-tuning.
-    
-    Args:
-        examples: Dictionary containing the examples
-        tokenizer: Tokenizer to use for tokenization
-        max_length: Maximum sequence length
-        
-    Returns:
-        Tokenized examples
-    """
-    # Ensure pad token is set
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
         
-    # Combine instruction, input, and output into a single text
     prompts = []
     for i in range(len(examples["instruction"])):
         instruction = examples["instruction"][i]
         context = examples["input"][i]
         response = examples["output"][i]
-        
-        # Create formatted prompt
+    
         prompt = f"### Instruction:\n{instruction}\n\n### Input:\n{context}\n\n### Response:\n{response}"
         prompts.append(prompt)
     
-    # Tokenize the prompts
+    # Tokenize prompts
     tokenized_inputs = tokenizer(
         prompts,
         padding="max_length",
@@ -64,29 +55,16 @@ def tokenize_function(examples, tokenizer, max_length=512):
         return_tensors="pt"
     )
     
-    # Set the labels to the input_ids (for causal language modeling)
+    # needed for causal
     tokenized_inputs["labels"] = tokenized_inputs["input_ids"].clone()
     
     return tokenized_inputs
 
 def prepare_sql_dataset(file_path, tokenizer, test_size=0.1, max_length=512):
-    """
-    Prepare the SQL dataset for fine-tuning.
-    
-    Args:
-        file_path: Path to the JSON file containing the SQL templates
-        tokenizer: Tokenizer to use for tokenization
-        test_size: Fraction of data to use for validation
-        max_length: Maximum sequence length
-        
-    Returns:
-        Train and validation datasets
-    """
-    # Load the SQL templates
+    # pulls from query templates json
     with open(file_path, 'r') as f:
         templates = json.load(f)
     
-    # Convert to dataset format
     dataset_dict = {
         "instruction": [],
         "input": [],
@@ -97,14 +75,11 @@ def prepare_sql_dataset(file_path, tokenizer, test_size=0.1, max_length=512):
         dataset_dict["instruction"].append(template["instruction"])
         dataset_dict["input"].append(template["input"])
         dataset_dict["output"].append(template["output"])
-    
-    # Create Dataset object
+
     dataset = Dataset.from_dict(dataset_dict)
-    
-    # Split dataset
+
     dataset = dataset.train_test_split(test_size=test_size, seed=42)
     
-    # Tokenize the datasets
     tokenized_train = dataset["train"].map(
         lambda examples: tokenize_function(examples, tokenizer, max_length),
         batched=True,
@@ -122,36 +97,22 @@ def prepare_sql_dataset(file_path, tokenizer, test_size=0.1, max_length=512):
 def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_tuned_model", 
                   batch_size=2, learning_rate=5e-5, num_train_epochs=3, 
                   gradient_accumulation_steps=4, fp16=False):
-    """
-    Fine-tune the model on the SQL dataset.
-    
-    Args:
-        model_name: Name or path of the model to fine-tune
-        train_dataset: Training dataset
-        eval_dataset: Evaluation dataset
-        output_dir: Directory to save the fine-tuned model
-        batch_size: Batch size for training
-        learning_rate: Learning rate
-        num_train_epochs: Number of training epochs
-        gradient_accumulation_steps: Number of gradient accumulation steps
-        fp16: Whether to use mixed precision training
-        
-    Returns:
-        Fine-tuned model and training metrics
-    """
-    # Load model and tokenizer
+   
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     
-    # Set pad token if it's not already set (needed for GPT-2 and similar models)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # Load a smaller model for fine-tuning with reduced precision
+    # Check if CUDA is available
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    print(f"Training using device: {device}")
+    
+    # Adjust floating-point precision based on device
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.float32,  # Use float32 instead of default
-        low_cpu_mem_usage=True      # Reduce memory usage
-    )
+        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,  
+        low_cpu_mem_usage=True      
+    ).to(device)
     
     # Set up data collator
     data_collator = DataCollatorForLanguageModeling(
@@ -159,7 +120,7 @@ def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_t
         mlm=False
     )
     
-    # Set up training arguments
+    # training arguments
     training_args = TrainingArguments(
         output_dir=output_dir,
         overwrite_output_dir=True,
@@ -178,8 +139,7 @@ def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_t
         metric_for_best_model="loss",
         greater_is_better=False,
     )
-    
-    # Set up trainer
+
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -201,41 +161,26 @@ def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_t
     return model, eval_metrics
 
 def load_templates(file_path):
-    """
-    Load SQL templates from a JSON file.
-    
-    Args:
-        file_path: Path to the JSON file containing the SQL templates
-        
-    Returns:
-        List of templates
-    """
     with open(file_path, 'r') as f:
         templates = json.load(f)
     return templates
 
 def generate_sql_from_prompt(model, tokenizer, prompt, max_new_tokens=256):
-    """
-    Generate SQL from a prompt using the fine-tuned model.
-    
-    Args:
-        model: Fine-tuned model
-        tokenizer: Tokenizer
-        prompt: Prompt for generating SQL
-        max_new_tokens: Maximum number of tokens to generate
-        
-    Returns:
-        Generated SQL
-    """
     # Ensure pad token is set
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
-        
+    
+    # Get the device the model is on
+    device = model.device
+    
+    # Tokenize the prompt and move tensors to the same device as the model
+    inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    
     # Format prompt
     formatted_prompt = f"### Instruction:\n{prompt}\n\n### Response:\n"
     
     # Tokenize prompt
-    input_ids = tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(model.device)
+    input_ids = tokenizer(formatted_prompt, return_tensors="pt").input_ids.to(device)
     
     # Generate SQL
     with torch.no_grad():
@@ -289,16 +234,7 @@ def evaluate_finetuned_model(model, tokenizer, test_templates, num_samples=5):
     
     return results
 
-def normalize_sql(sql):
-    """
-    Normalize SQL query for comparison.
-    
-    Args:
-        sql: SQL query
-        
-    Returns:
-        Normalized SQL query
-    """
+def normalize_sql(sql): 
     # Remove extra whitespace
     sql = ' '.join(sql.split())
     
@@ -346,21 +282,23 @@ def compare_results(result1, result2):
     return set1 == set2
 
 def main():
-    """
-    Main function to run the fine-tuning process.
-    """
     # Parse command-line arguments
     if len(sys.argv) > 1:
         action = sys.argv[1]
     else:
-        action = "finetune"
-    
+        action = "finetune"  # Default action
+        
     # Set up paths
     data_file = "sql_templates.json"
     output_dir = "./fine_tuned_model"
+ 
+    model_name = "Qwen/QwQ-32B"  
     
-    # Model name or path - use a tiny model that's easier to fine-tune
-    model_name = "gpt2"  # Use a small model that will definitely work locally
+    # Print CUDA availability info
+    print(f"CUDA available: {torch.cuda.is_available()}")
+    if torch.cuda.is_available():
+        print(f"CUDA device: {torch.cuda.get_device_name(0)}")
+        print(f"CUDA device count: {torch.cuda.device_count()}")
     
     if action == "finetune":
         print("Starting fine-tuning process...")
