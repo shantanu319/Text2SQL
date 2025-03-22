@@ -11,3 +11,4 @@ safetensors>=0.3.0
 einops>=0.6.0
 flash-attn>=2.0.0
 peft>=0.4.0
+datasets>=2.14.0
