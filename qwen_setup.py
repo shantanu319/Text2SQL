@@ -12,6 +12,7 @@ import sqlite3
 import re
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import subprocess
 
 def setup_qwen():
     model_name = "Qwen/Qwen2.5-Coder-1.5B"  # Use Qwen 2.5 Coder model
@@ -102,49 +103,42 @@ def prepare_sql_dataset(file_path, tokenizer, test_size=0.1, max_length=512):
     return tokenized_train, tokenized_val
 
 def load_spider_dataset(spider_dir, tokenizer, max_length=512, test_size=0.1):
-    """
-    Load and prepare Spider dataset for fine-tuning
-    """
-    # Try to find the Spider dataset files
     spider_files = []
     for root, dirs, files in os.walk(spider_dir):
         for file in files:
-            if file.endswith('.jsonl'):
+            if file.endswith('.jsonl') and ('spider' in file.lower() or 'eval' in file.lower()):
                 spider_files.append(os.path.join(root, file))
     
     if not spider_files:
         return None, None
-    
-    # Load and process dataset
+
     all_examples = []
     for file_path in spider_files:
         with open(file_path, 'r') as f:
             for line in f:
                 example = json.loads(line.strip())
-                # Extract instruction from Spider format
-                instruction = example.get('instruction', '')
-                if instruction:
+                # Use "question" if available (standard in Spider); fallback to "instruction"
+                question = example.get('question', example.get('instruction', ''))
+                if question:
+                    # We leave "output" empty here since Spider evaluation suite uses its own gold files.
                     all_examples.append({
-                        "instruction": f"Convert this text to SQL: {instruction}",
-                        "input": "",  # Spider doesn't always have explicit context
-                        "output": ""  # We don't have ground truth SQL here
+                        "instruction": f"{question}",
+                        "input": "",  
+                        "output": ""
                     })
     
     if not all_examples:
         return None, None
     
-    # Create dataset
     spider_dataset = Dataset.from_list(all_examples)
     
-    # Split dataset
     train_dataset, val_dataset = train_test_split(
         spider_dataset, test_size=test_size, random_state=42
     )
     
     train_dataset = Dataset.from_pandas(pd.DataFrame(train_dataset))
     val_dataset = Dataset.from_pandas(pd.DataFrame(val_dataset))
-    
-    # Tokenize datasets
+
     tokenized_train = train_dataset.map(
         lambda examples: tokenize_function(examples, tokenizer, max_length),
         batched=True,
@@ -159,6 +153,7 @@ def load_spider_dataset(spider_dir, tokenizer, max_length=512, test_size=0.1):
     
     return tokenized_train, tokenized_val
 
+
 def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_tuned_model", 
                   batch_size=1, learning_rate=2e-5, num_train_epochs=3, 
                   gradient_accumulation_steps=16, fp16=False):
@@ -171,21 +166,20 @@ def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_t
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     
-    # Load model with memory optimization settings
+
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        device_map="auto",  # Automatically determine device mapping
-        low_cpu_mem_usage=True,  # Reduce CPU memory usage during loading
+        device_map="auto",  
+        low_cpu_mem_usage=True,  
         trust_remote_code=True
     )
 
-    # Prepare training arguments with memory optimization settings
     training_args = TrainingArguments(
         output_dir=output_dir,
         num_train_epochs=num_train_epochs,
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
-        gradient_accumulation_steps=gradient_accumulation_steps,  # Increased to reduce memory usage
+        gradient_accumulation_steps=gradient_accumulation_steps,  
         learning_rate=learning_rate,
         weight_decay=0.01,
         warmup_ratio=0.03,
@@ -194,13 +188,13 @@ def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_t
         logging_steps=10,
         save_strategy="epoch",
         fp16=fp16,
-        optim="adamw_torch",  # More memory-efficient optimizer
+        optim="adamw_torch",  
         gradient_checkpointing=True,  # Enable gradient checkpointing
-        save_total_limit=1,  # Only keep the most recent checkpoint
+        save_total_limit=1, 
         ddp_find_unused_parameters=False,
         disable_tqdm=False,
-        max_grad_norm=1.0,  # Limit gradient norm for stability
-        dataloader_num_workers=0,  # Reduce parallelism to save memory
+        max_grad_norm=1.0, 
+        dataloader_num_workers=0,  
         dataloader_pin_memory=False,  # Disable pinning memory
     )
     
@@ -227,9 +221,7 @@ def load_templates(file_path):
     return templates
 
 def generate_sql_from_prompt(model, tokenizer, prompt, max_new_tokens=512):
-    """
-    Generate SQL from a natural language prompt using the fine-tuned model
-    """
+
     # Ensure pad token is set
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -237,7 +229,7 @@ def generate_sql_from_prompt(model, tokenizer, prompt, max_new_tokens=512):
     # Format prompt using Qwen 2.5 chat format
     formatted_prompt = f"<im_start>assistant\nConvert this text to SQL: {prompt}<im_end>\n<im_start>assistant\n"
     
-    # Tokenize prompt
+
     inputs = tokenizer(formatted_prompt, return_tensors="pt").to(model.device)
     
     with torch.no_grad():
@@ -251,10 +243,9 @@ def generate_sql_from_prompt(model, tokenizer, prompt, max_new_tokens=512):
             repetition_penalty=1.1
         )
     
-    # Decode generated SQL and clean up
+
     generated_text = tokenizer.decode(output_ids[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-    
-    # Extract SQL from response
+
     generated_sql = generated_text.strip()
     if "<im_end>" in generated_sql:
         generated_sql = generated_sql.split("<im_end>")[0].strip()
@@ -262,25 +253,47 @@ def generate_sql_from_prompt(model, tokenizer, prompt, max_new_tokens=512):
     return generated_sql
 
 def evaluate_finetuned_model(model, tokenizer, test_templates, num_samples=5):
+
     if num_samples > len(test_templates):
         num_samples = len(test_templates)
     
     samples = random.sample(test_templates, num_samples)
-    
     results = []
     
-    for template in samples:
-        # Create prompt
-        prompt = f"{template['instruction']}\n\n{template.get('input', '')}"
+    print("\n===== EVALUATION RESULTS =====\n")
+    
+    for i, template in enumerate(samples):
+        # Construct prompt from instruction and optional input
+        prompt = f"{template.get('instruction', '')}"
+        if template.get('input', ''):
+            prompt += f"\n\n{template.get('input', '')}"
         
         # Generate SQL
         generated_sql = generate_sql_from_prompt(model, tokenizer, prompt)
-
+        
+        # Print detailed results
+        print(f"Sample #{i+1}")
+        print(f"Instruction: {template.get('instruction', '')}")
+        if template.get('input', ''):
+            print(f"Input: {template.get('input', '')}")
+        print(f"Expected SQL: {template.get('output', '')}")
+        print(f"Generated SQL: {generated_sql}")
+        
+        is_correct = normalize_sql(template.get("output", "")) == normalize_sql(generated_sql)
+        print(f"Match: {'✓' if is_correct else '✗'}")
+        print("-" * 50)
+        
         results.append({
             "prompt": prompt,
-            "expected_sql": template.get("output", ""),
-            "generated_sql": generated_sql
+            "expected_sql": template.get('output', ''),
+            "generated_sql": generated_sql,
+            "is_correct": is_correct
         })
+    
+    # Compute and display overall accuracy
+    correct_count = sum(1 for r in results if r["is_correct"])
+    accuracy = 100 * correct_count / len(results) if results else 0
+    print(f"Overall Accuracy: {correct_count}/{len(results)} ({accuracy:.1f}%)")
     
     return results
 
@@ -306,52 +319,134 @@ def compare_results(result1, result2):
     
     return set1 == set2
 
-def process_spider_dataset(model, tokenizer, spider_dir, output_file="spider_predictions.json"):
-    # Try to find the Spider dataset files
+def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_results"):
+    os.makedirs(output_dir, exist_ok=True)
+    predictions_file = os.path.join(output_dir, "spider_predictions.json")
+    
+    # Look for the Spider evaluation suite in common paths
+    eval_suite_paths = [
+        os.path.join(spider_dir, "Spider2/spider2/evaluation_suite"),
+        os.path.join(spider_dir, "Spider2/spider2-lite/evaluation_suite"),
+        os.path.join(spider_dir, "Spider2/spider2-snow/evaluation_suite")
+    ]
+    
+    eval_suite_path = None
+    for path in eval_suite_paths:
+        if os.path.exists(path):
+            eval_suite_path = path
+            break
+    
+    # Search for Spider dataset files (look for any spider-related jsonl files)
     spider_files = []
     for root, dirs, files in os.walk(spider_dir):
         for file in files:
-            if file.endswith('.jsonl'):
+            if file.endswith('.jsonl') and ('spider' in file.lower() or 'eval' in file.lower()):
                 spider_files.append(os.path.join(root, file))
     
     if not spider_files:
+        print("No Spider dataset files found.")
         return None
     
-    # Process each file
     all_predictions = []
+    results_metadata = []
+    
+    print(f"Found {len(spider_files)} Spider dataset files.")
     for file_path in spider_files:
+        print(f"Processing file: {os.path.basename(file_path)}")
         with open(file_path, 'r') as f:
             for line in f:
                 example = json.loads(line.strip())
-                instruction = example.get('instruction', '')
-                instance_id = example.get('instance_id', '')
+                # Use the "question" field if available; otherwise, fallback to "instruction"
+                question = example.get('question', example.get('instruction', ''))
+                # Use "db_id" if available; otherwise "instance_id", or generate an id
+                instance_id = example.get('db_id', example.get('instance_id', ''))
+                if not instance_id:
+                    instance_id = f"instance_{len(all_predictions)}"
                 
-                if instruction:
-                    # Generate SQL
-                    generated_sql = generate_sql_from_prompt(model, tokenizer, instruction)
+                if question:
+                    generated_sql = generate_sql_from_prompt(model, tokenizer, question)
                     
-                    # Save prediction
-                    all_predictions.append({
+                    prediction = {
                         "instance_id": instance_id,
-                        "instruction": instruction,
+                        "question": question,
                         "predicted_sql": generated_sql
+                    }
+                    all_predictions.append(prediction)
+                    
+                    # Save individual prediction for the evaluation suite
+                    instance_dir = os.path.join(output_dir, instance_id)
+                    os.makedirs(instance_dir, exist_ok=True)
+                    sql_file_path = os.path.join(instance_dir, "pred.sql")
+                    with open(sql_file_path, 'w') as sql_file:
+                        sql_file.write(generated_sql)
+                    
+                    results_metadata.append({
+                        "instance_id": instance_id,
+                        "answer_type": "file",
+                        "answer_or_path": "pred.sql"
                     })
     
-    # Save predictions
-    with open(output_file, 'w') as f:
+    # Save all predictions to a JSON file
+    with open(predictions_file, 'w') as f:
         json.dump(all_predictions, f, indent=2)
     
-    print(f"Processed {len(all_predictions)} examples, saved to {output_file}")
-    return all_predictions
+    # Save metadata required by the evaluation suite (each line is a JSON object)
+    results_metadata_file = os.path.join(output_dir, "results_metadata.jsonl")
+    with open(results_metadata_file, 'w') as f:
+        for item in results_metadata:
+            f.write(json.dumps(item) + '\n')
+    
+    print(f"Processed {len(all_predictions)} examples, predictions saved to {predictions_file}")
+    
+    eval_metrics = {}
+    # Run the evaluation if the Spider evaluation suite is found
+    if eval_suite_path:
+        print(f"Found Spider evaluation suite at {eval_suite_path}")
+        gold_dir = os.path.join(eval_suite_path, "gold")
+        if os.path.exists(gold_dir):
+            print("Running Spider evaluation...")
+            eval_script = os.path.join(eval_suite_path, "evaluate.py")
+            if os.path.exists(eval_script):
+                result_file = os.path.join(output_dir, "evaluation_results.json")
+                cmd = [
+                    sys.executable, 
+                    eval_script, 
+                    "--result_dir", output_dir, 
+                    "--gold_dir", gold_dir,
+                    "--outfile", result_file  # Pass outfile if supported by the evaluation suite
+                ]
+                try:
+                    completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
+                    print("Evaluation completed successfully.")
+                    if os.path.exists(result_file):
+                        with open(result_file, 'r') as rf:
+                            eval_metrics = json.load(rf)
+                        print("Evaluation Metrics:")
+                        for key, value in eval_metrics.items():
+                            print(f"{key}: {value}")
+                    else:
+                        print("Evaluation results file not found.")
+                except subprocess.CalledProcessError as e:
+                    print("Error running evaluation suite:")
+                    print(e.stderr)
+            else:
+                print("Evaluation script not found in the evaluation suite.")
+        else:
+            print(f"Gold directory not found at {gold_dir}")
+    else:
+        print("Spider evaluation suite not found. Skipping evaluation.")
+    
+    return {"predictions": all_predictions, "evaluation_metrics": eval_metrics}
+
 
 def main():
-    # Parse command-line arguments
+    # using cl args
     if len(sys.argv) > 1:
         action = sys.argv[1]
     else:
         action = "finetune"
     
-    # Set up paths
+    # paths
     data_file = "combined_sql_templates.json"  
     spider_dir = os.path.expanduser("~/txt2sql_461") 
     output_dir = "./fine_tuned_model"
@@ -373,18 +468,17 @@ def main():
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
     
-        # Prepare SQL templates dataset with reduced max_length
+
         train_dataset, eval_dataset = prepare_sql_dataset(data_file, tokenizer, max_length=384)  
     
         print(f"Training on {len(train_dataset)} examples, evaluating on {len(eval_dataset)} examples")
         
-        # Clear cache before training
+    
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
         elif hasattr(torch.mps, 'empty_cache'):
             torch.mps.empty_cache()
         
-        # Fine-tune model with memory-optimized settings
         model, metrics = finetune_model(
             model_name=model_name,
             train_dataset=train_dataset,
@@ -402,42 +496,30 @@ def main():
     elif action == "evaluate":
         print("Evaluating model on test templates...")
         
-        # Load fine-tuned model and tokenizer
         tokenizer = AutoTokenizer.from_pretrained(output_dir)
-
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
-        
         model = AutoModelForCausalLM.from_pretrained(output_dir)
         
         test_templates = load_templates(data_file)
-        
         results = evaluate_finetuned_model(model, tokenizer, test_templates)
-        
-        # Print results
-        correct_count = 0
-        for i, result in enumerate(results):
-            if normalize_sql(result['expected_sql']) == normalize_sql(result['generated_sql']):
-                correct_count += 1
-                
-        print(f"Accuracy: {correct_count}/{len(results)} ({100*correct_count/len(results):.1f}%)")
                 
     elif action == "process_spider":
         print("Processing Spider dataset...")
-        
-        # Load fine-tuned model and tokenizer
         tokenizer = AutoTokenizer.from_pretrained(output_dir)
-        
-        # Ensure pad token is set
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
-        
         model = AutoModelForCausalLM.from_pretrained(output_dir)
         
-        # Process Spider dataset
-        predictions = process_spider_dataset(model, tokenizer, spider_dir)
-        if predictions:
-            print(f"Processed {len(predictions)} examples, results saved to spider_predictions.json")
+        results = process_spider_dataset(model, tokenizer, spider_dir)
+        if results:
+            predictions = results.get("predictions", [])
+            metrics = results.get("evaluation_metrics", {})
+            print(f"Processed {len(predictions)} examples, predictions saved to spider_predictions.json")
+            if metrics:
+                print("Spider Evaluation Metrics:")
+                for key, value in metrics.items():
+                    print(f"{key}: {value}")
     
     else:
         print(f"Unknown action: {action}")
