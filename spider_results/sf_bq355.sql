@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM patients WHERE medication = 'quinapril' AND RxCUI != '35208';

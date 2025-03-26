@@ -1,0 +1,1 @@
+SELECT page_name FROM visits WHERE user_id = '1402138.5184246691' AND visit_date = '2021-01-02';

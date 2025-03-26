@@ -1,0 +1,1 @@
+SELECT AVG(pageview_diff) FROM (

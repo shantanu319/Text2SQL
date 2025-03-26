@@ -1,0 +1,1 @@
+SELECT highway, SUM(length) as total_length FROM planet_features WHERE multipolygon_boundary = 'Q35' GROUP BY highway ORDER BY total_length DESC LIMIT 5

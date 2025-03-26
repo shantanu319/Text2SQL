@@ -1,0 +1,1 @@
+SELECT state_name, AVG(median_income_difference) as avg_median_income_diff

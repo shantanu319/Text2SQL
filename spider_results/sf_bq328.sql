@@ -1,0 +1,1 @@
+SELECT region, AVG(median_gdp) as avg_median_gdp

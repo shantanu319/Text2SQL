@@ -1,0 +1,1 @@
+SELECT p.category, COUNT(p.payment_type) as num_payments FROM products p GROUP BY p.category ORDER BY num_payments DESC LIMIT 3

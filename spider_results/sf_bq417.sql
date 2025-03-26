@@ -1,0 +1,1 @@
+SELECT * FROM MedicalImages WHERE Gender = 'Male' AND Age = 18 AND StudyDate > '2014-09-01'

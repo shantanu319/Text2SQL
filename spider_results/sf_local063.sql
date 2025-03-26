@@ -1,0 +1,1 @@
+SELECT p.product_name FROM products p JOIN sales s ON p.id = s.product_id WHERE s.promo_id = 999 AND s.city IN (SELECT c.city FROM cities c JOIN sales s2 ON c.id = s2.city_id WHERE s2.calendar_quarter_id = 1772 AND s2.sales > s.sales * 1.2)

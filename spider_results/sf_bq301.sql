@@ -1,0 +1,1 @@
+SELECT a.id, a.reputation, a.score, COUNT(a.comments) AS comment_count

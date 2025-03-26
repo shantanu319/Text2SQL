@@ -1,0 +1,1 @@
+SELECT country, ROUND((SUM(IF(age <= 24, 1, 0)) / COUNT(*)) * 100, 2) AS percent_under_25 FROM population_data WHERE year = 2017 GROUP BY country ORDER BY percent_under_25 DESC

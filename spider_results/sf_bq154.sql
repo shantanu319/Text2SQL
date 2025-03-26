@@ -1,0 +1,1 @@
+SELECT COUNT(*) AS num_groups, SUM(num_samples) AS total_num_samples, H

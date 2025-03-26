@@ -1,0 +1,1 @@
+SELECT (SUM(gross_income_inflow) - SUM(old_gross_income_inflow)) / SUM(old_gross_income_inflow) * 100 AS percent_change

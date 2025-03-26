@@ -1,0 +1,1 @@
+SELECT p.name, COUNT(*) AS num_points FROM multipolygon m JOIN point p ON ST_Contains(m.geometry, p.geometry) WHERE m.wikidata IS NULL GROUP BY p.name ORDER BY num_points DESC LIMIT 2

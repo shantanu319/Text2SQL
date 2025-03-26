@@ -1,0 +1,1 @@
+SELECT a.name, COUNT(*) as num_applications, MAX(b.year) as max_year, SUM(CASE WHEN b.year = MAX(b.year) THEN c.num_applications ELSE 0 END) as num_applications_in_max_year, d.country_code FROM assignees a JOIN (

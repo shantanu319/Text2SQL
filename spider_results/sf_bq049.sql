@@ -1,0 +1,1 @@
+SELECT SUM(sales) FROM whiskey_sales WHERE year = 2022 AND county = 'Dubuque County' AND zip_code IN (SELECT zip_code FROM whiskey_sales GROUP BY zip_code ORDER BY SUM(sales) DESC LIMIT 3)

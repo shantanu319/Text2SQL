@@ -1,0 +1,1 @@
+SELECT city, AVG(total_payments), AVG(delivered_order_count) FROM (

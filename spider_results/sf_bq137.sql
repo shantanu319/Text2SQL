@@ -1,0 +1,1 @@
+SELECT z.zip_code_area_id, z.polygon, z.land_area_meters, z.water_area_meters, z.latitude, z.longitude, s.state_code, s.state_name, c.city, c.county, SUM(p.population) AS total_population

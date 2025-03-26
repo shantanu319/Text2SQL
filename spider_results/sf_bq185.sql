@@ -1,0 +1,1 @@
+SELECT AVG(duration) FROM yellow_taxi_trips WHERE pickup_datetime BETWEEN '2016-02-01' AND '2016-02-07' AND dropoff_datetime BETWEEN '2016-02-01' AND '2016-02-07' AND passenger_count > 3 AND trip_distance >= 10 AND pickup_location IN ('Brooklyn')

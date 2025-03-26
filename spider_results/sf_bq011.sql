@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM pseudo_users WHERE

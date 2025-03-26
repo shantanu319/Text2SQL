@@ -1,0 +1,1 @@
+SELECT ROUND(AVG(speed), 1) FROM trips WHERE city = 'Berkeley' AND distance > 1000

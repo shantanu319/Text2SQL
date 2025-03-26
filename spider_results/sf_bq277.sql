@@ -1,0 +1,1 @@
+SELECT * FROM ports WHERE region_number = '6585' AND state_boundary IS NOT NULL

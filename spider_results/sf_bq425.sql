@@ -1,0 +1,1 @@
+SELECT DISTINCT m.trade_name, MAX(m.approval_date) as latest_approval_date FROM molecules m JOIN approvals a ON m.molecule_id = a.molecule_id WHERE m.company = 'SanofiAventis';

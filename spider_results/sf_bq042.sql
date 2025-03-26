@@ -1,0 +1,1 @@
+SELECT AVG(temperature), AVG(wind_speed), AVG(precipitation) FROM weather_data WHERE airport = 'LaGuardia Airport' AND city = 'New York City' AND month = 6 AND day = 12 AND year BETWEEN 2011 AND 2020 AND station_id = 725030

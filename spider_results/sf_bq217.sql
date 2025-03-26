@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM github_pull_requests WHERE created_at = '2023-01-18' AND repository_language IN ('JavaScript');

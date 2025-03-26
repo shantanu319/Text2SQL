@@ -1,0 +1,1 @@
+SELECT MONTH(date), ROUND(AVG(volume_percent), 1) AS max_volume_month, AVG(input_utxo_ratio) AS avg_input_utxo_ratio, AVG(output_utxo_ratio) AS avg_output_utxo_ratio FROM bitcoin_transactions WHERE YEAR(date) = 2021 AND coinjoin = 'true' GROUP BY MONTH(date);

@@ -1,0 +1,1 @@
+SELECT t.trip_id, t.duration_in_seconds, t.start_date, s.name AS start_station_name, r.route, b.number, m.subscriber_type, m.birth_year, CURRENT_YEAR - m.birth_year AS age, CASE WHEN CURRENT_YEAR - m.birth_year < 40 THEN 'Younger than 40' WHEN CURRENT_YEAR - m.birth_year BETWEEN 40 AND 60 THEN 'Between 40 and 60' ELSE 'Older than 60' END AS age_classification, g.gender, s.region

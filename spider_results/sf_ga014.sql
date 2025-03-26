@@ -1,0 +1,1 @@
+SELECT event_params.channel, COUNT(*) as session_count

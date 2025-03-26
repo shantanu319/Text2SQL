@@ -1,0 +1,1 @@
+SELECT AVG(CAST((ABS(DATEDIFF(YEAR, debut_date, final_game_date)) + ABS(DATEDIFF(MONTH, debut_date, final_game_date))/12) AS FLOAT))

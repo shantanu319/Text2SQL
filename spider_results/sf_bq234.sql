@@ -1,0 +1,1 @@
+SELECT state, COUNT(*) as num_prescriptions FROM medications WHERE year = 2014 GROUP BY state

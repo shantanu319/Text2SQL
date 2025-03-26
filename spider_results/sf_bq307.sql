@@ -1,0 +1,1 @@
+SELECT badge_name, COUNT(*) AS num_users_earned_first_gold_badge, AVG(DATEDIFF(CURRENT_DATE(), account_creation_date)) AS avg_days_from_account_creation_to_badge_earn

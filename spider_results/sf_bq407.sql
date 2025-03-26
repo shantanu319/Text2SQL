@@ -1,0 +1,1 @@
+SELECT county_name, state, median_age, total_population, confirmed_cases_per_100k, deaths_per_100k, case_fatality_rate

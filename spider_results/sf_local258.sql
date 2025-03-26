@@ -1,0 +1,1 @@
+SELECT b.name, COUNT(*) AS total_wickets, SUM(r.runs) / SUM(b.overs_bowled) AS economy_rate, AVG(100 * r.balls / b.wickets_taken) AS strike_rate, MAX(m.match_id || '-' || m.wickets_taken) AS best_performance

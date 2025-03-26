@@ -1,0 +1,1 @@
+SELECT app_group_id,

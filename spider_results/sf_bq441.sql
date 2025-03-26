@@ -1,0 +1,1 @@
+SELECT * FROM traffic_accidents WHERE year = '2015';

@@ -1,0 +1,1 @@
+SELECT sender FROM transactions WHERE block_size > 4096 AND to_address IS NOT NULL

@@ -1,0 +1,1 @@
+SELECT pickup_zone, dropoff_zone, trip_duration_in_seconds, driving_speed_in_mph, tip_rate_percentage FROM taxi_trips WHERE pickup_time BETWEEN '2016-07-01' AND '2016-07-07' AND dropoff_time > pickup_time AND passenger_count > 5 AND trip_distance >= 10 AND fare_amount + tip_amount + tolls_amount + mta_tax_amount + fare_amount <= 0

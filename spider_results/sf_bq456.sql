@@ -1,0 +1,1 @@
+SELECT d.PatientID, d.StudyInstanceUID, d.StudyDate, f.CodeMeaning, MAX(q.quantitative_measurements) AS max_quantitative_measurements

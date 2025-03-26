@@ -1,0 +1,1 @@
+SELECT start_position FROM variant_table WHERE gene = 'BRCA1' AND chromosome = '17' AND reference_base = 'C' AND alternate_base = 'T';

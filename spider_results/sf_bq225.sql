@@ -1,0 +1,1 @@
+SELECT language FROM github_repos.sample_files JOIN github_repos.sample_contents ON sample_files.file_id = sample_contents.file_id WHERE language IS NOT NULL GROUP BY language ORDER BY COUNT(*) DESC LIMIT 10

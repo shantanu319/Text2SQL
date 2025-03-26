@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM planet_ways WHERE highway IN ('motorway', 'trunk', 'primary', 'secondary', 'residential') AND (

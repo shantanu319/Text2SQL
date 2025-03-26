@@ -1,0 +1,1 @@
+SELECT country, SUM(amount) as total_amount FROM debt_data WHERE region IS NOT NULL GROUP BY country ORDER BY total_amount DESC LIMIT 10

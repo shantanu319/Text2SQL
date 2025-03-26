@@ -1,0 +1,1 @@
+SELECT YEAR(date) AS year, COUNT(DISTINCT station_id) AS num_stations FROM bike_share_data WHERE date BETWEEN '2013-01-01' AND '2014-12-31' GROUP BY YEAR(date);

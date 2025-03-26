@@ -1,0 +1,1 @@
+SELECT name, AVG(runs) as avg_runs_per_match FROM players WHERE season = 5 GROUP BY name ORDER BY avg_runs_per_match DESC LIMIT 5

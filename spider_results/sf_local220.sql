@@ -1,0 +1,1 @@
+SELECT player_name, COUNT(*) as num_matches FROM players

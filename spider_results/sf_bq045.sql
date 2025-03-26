@@ -1,0 +1,1 @@
+SELECT station_name, COUNT(*) AS rainy_days_count FROM weather_data WHERE year = 2023 AND precipitation > 0 AND precipitation != 99.99 GROUP BY station_name HAVING COUNT(*) > (SELECT COUNT(*) FROM weather_data WHERE year = 2022 AND precipitation > 0 AND precipitation != 99.99)

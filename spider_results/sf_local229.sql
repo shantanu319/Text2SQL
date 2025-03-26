@@ -1,0 +1,1 @@
+SELECT p1.id AS player_1_id, p2.id AS player_2_id, p1.score + p2.score AS total_score

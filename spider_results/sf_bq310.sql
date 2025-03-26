@@ -1,0 +1,1 @@
+SELECT title FROM questions WHERE tag = 'android-layout' AND tag = 'android-activity' AND tag = 'android-intent'

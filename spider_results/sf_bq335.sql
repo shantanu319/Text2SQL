@@ -1,0 +1,1 @@
+SELECT a.address FROM bitcoin_addresses a JOIN transactions t ON a.id = t.address_id WHERE t.date IN (SELECT MAX(date) FROM transactions WHERE address_id = a.id AND year(date) = 2017) GROUP BY a.address HAVING SUM(t.value) > (

@@ -1,0 +1,1 @@
+SELECT e.medium_code, s.substance_code, COUNT(*) as occurrence_count FROM SM

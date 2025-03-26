@@ -1,0 +1,1 @@
+SELECT COUNT(*) as count FROM legislators WHERE gender = 'male' AND state = 'Louisiana'

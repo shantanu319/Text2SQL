@@ -1,0 +1,1 @@
+SELECT DISTINCT jurisdiction_code FROM patents WHERE assignee = (SELECT assignee FROM patents GROUP BY assignee ORDER BY COUNT(*) DESC LIMIT 1) AND patent_category = 'A61'

@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM laps WHERE lap_number <= 5 AND (category = 'retirement' OR category = 'pit stop' OR category = 'start-related overtake' OR category = 'standard on-track pass');

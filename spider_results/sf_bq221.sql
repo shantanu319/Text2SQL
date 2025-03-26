@@ -1,0 +1,1 @@
+SELECT cpc_title, YEAR(filing_date) AS best_year, MAX(EMA) AS max_ema

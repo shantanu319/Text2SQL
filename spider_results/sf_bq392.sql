@@ -1,0 +1,1 @@
+SELECT date FROM weather_data WHERE station_number = 723758 AND month = 'October' AND year = 2009 ORDER BY avg_temperature DESC LIMIT 3

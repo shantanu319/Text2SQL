@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM patents WHERE year BETWEEN 2008 AND 2018 AND claim LIKE '%claim%';

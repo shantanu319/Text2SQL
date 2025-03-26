@@ -1,0 +1,1 @@
+SELECT p.category, AVG(p.payment_method_count) AS avg_payment_method_count

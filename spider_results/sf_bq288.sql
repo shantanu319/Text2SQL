@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM BankingInstitutions WHERE InstitutionName LIKE 'Bank%' AND EstablishedYear BETWEEN 1900 AND 2000;

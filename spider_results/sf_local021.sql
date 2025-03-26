@@ -1,0 +1,1 @@
+SELECT AVG(total_runs) FROM players WHERE total_runs > 50

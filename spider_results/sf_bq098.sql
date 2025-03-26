@@ -1,0 +1,1 @@
+SELECT borough, COUNT(*) / SUM(CASE WHEN tip_rate = 0 THEN 1 ELSE 0 END) * 100 AS percent_no_tip

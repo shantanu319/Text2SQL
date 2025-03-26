@@ -1,0 +1,1 @@
+SELECT c.name AS constructor_name, COUNT(*) AS num_seasons_with_fewest_points

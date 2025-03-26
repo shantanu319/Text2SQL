@@ -1,0 +1,1 @@
+SELECT name FROM baseball_players WHERE (games_played + runs + hits + home_runs) = (

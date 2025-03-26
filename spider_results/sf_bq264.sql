@@ -1,0 +1,1 @@
+SELECT MAX(registered_date) - MIN(registered_date) AS age_difference FROM users WHERE registered_date BETWEEN '2019-01-01' AND '2022-04-30';

@@ -1,0 +1,1 @@
+SELECT SUM(price) FROM orders WHERE pizza_type = 'Meat Lovers' AND price = 12

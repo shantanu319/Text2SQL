@@ -1,0 +1,1 @@
+SELECT id, date, title, normalize(article_vector) AS article_vector

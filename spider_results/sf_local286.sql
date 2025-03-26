@@ -1,0 +1,1 @@
+SELECT seller_name, SUM(quantity) AS total_sales, AVG(price) AS avg_item_price, AVG(review_score) AS avg_review_scores, MIN(packing_time) AS min_packing_times FROM sellers

@@ -1,0 +1,1 @@
+SELECT COUNT(*) AS num_variants, SUM(allele_count) AS total_allele_count, SUM(num_alleles) AS total_num_alleles, COUNT(DISTINCT gene_symbol) AS num_genes FROM variant_table WHERE chrom = 'chr1' AND pos BETWEEN 55039447 AND 55064852;

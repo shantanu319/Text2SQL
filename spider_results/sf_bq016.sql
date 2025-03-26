@@ -1,0 +1,1 @@
+SELECT package_name, package_version FROM npm_packages WHERE

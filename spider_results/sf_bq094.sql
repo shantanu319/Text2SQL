@@ -1,0 +1,1 @@
+SELECT c.name, COUNT(DISTINCT c.candidate_id) AS num_candidates, GROUP_CONCAT(c.candidate_name ORDER BY c.candidate_name SEPARATOR ', ') AS candidate_names, SUM(s.amount) AS total_donations

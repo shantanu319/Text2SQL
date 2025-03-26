@@ -1,0 +1,1 @@
+SELECT (SUM(weekly_search_frequency) / SUM(SUM(weekly_search_frequency))) * 100 AS overall_percentage_change

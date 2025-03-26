@@ -1,0 +1,1 @@
+SELECT COUNT(DISTINCT user_id) FROM visits WHERE visit_date >= '2021-01-01' AND visit_date < '2021-02-01';

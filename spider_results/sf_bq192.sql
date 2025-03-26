@@ -1,0 +1,1 @@
+SELECT r.name, COUNT(DISTINCT w.id) AS watchers_count, COUNT(i.event_id) AS issues_count, f.forks

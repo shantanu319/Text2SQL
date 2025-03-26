@@ -1,0 +1,1 @@
+SELECT COUNT(*) AS num_patents, AVG(COUNT(inventor_id)) AS avg_inventors_per_patent FROM patents WHERE filing_year BETWEEN 1960 AND 2020 GROUP BY YEAR(filing_year)

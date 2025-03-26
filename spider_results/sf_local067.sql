@@ -1,0 +1,1 @@
+SELECT MIN(profit), MAX(profit) FROM (

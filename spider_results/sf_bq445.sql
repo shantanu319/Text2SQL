@@ -1,0 +1,1 @@
+SELECT Protein_position FROM variants WHERE (

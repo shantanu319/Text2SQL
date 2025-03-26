@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM counties WHERE (unemployment_increase = 'Yes' AND dual_eligible_decrease = 'Yes')

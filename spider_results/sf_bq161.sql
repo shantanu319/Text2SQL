@@ -1,0 +1,1 @@
+SELECT SUM(CASE WHEN (clinical_data.KRAS_mutation = 'Yes' AND clinical_data.TP53_mutation = 'Yes') THEN 1 ELSE 0 END) -

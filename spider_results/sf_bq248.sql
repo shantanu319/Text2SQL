@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM repository WHERE NOT EXISTS (SELECT 1 FROM language WHERE name LIKE '%python%') AND path LIKE '%/README.MD%' AND content LIKE '%Copyright (c)%';

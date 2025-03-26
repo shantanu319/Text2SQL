@@ -1,0 +1,1 @@
+SELECT COUNT(DISTINCT CASE WHEN (event_name = 'Home Page View') THEN user_id ELSE NULL END) /

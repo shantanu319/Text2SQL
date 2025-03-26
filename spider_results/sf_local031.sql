@@ -1,0 +1,1 @@
+SELECT MAX(monthly_delivered_orders_volume) FROM (

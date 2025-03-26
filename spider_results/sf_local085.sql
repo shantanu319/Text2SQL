@@ -1,0 +1,1 @@
+SELECT e.id, COUNT(*) AS num_late_orders, (COUNT(*) / SUM(CASE WHEN o.shipped_date >= o.required_date THEN 1 ELSE 0 END)) * 100 AS late_order_percentage

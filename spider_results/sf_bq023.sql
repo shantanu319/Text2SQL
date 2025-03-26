@@ -1,0 +1,1 @@
+SELECT c.tract_id, AVG(d.amount) AS avg_donation_amount, MEDIAN(c.income) AS median_income

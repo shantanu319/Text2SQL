@@ -1,0 +1,1 @@
+SELECT p.name AS pathway_name, COUNT(DISTINCT t.target_id) AS target_count, COUNT(DISTINCT n.target_id) AS non_target_count

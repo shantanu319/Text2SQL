@@ -1,0 +1,1 @@
+SELECT * FROM trade_report WHERE closing_price IN (SELECT TOP 6 closing_price FROM trade_report ORDER BY closing_price DESC);

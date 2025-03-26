@@ -1,0 +1,1 @@
+SELECT r.region_name, r.trip_id, r.duration, r.start_time, s.station_name, r.gender

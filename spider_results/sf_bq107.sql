@@ -1,0 +1,1 @@
+SELECT variant_density FROM cannabis_reference WHERE reference_length = (SELECT MAX(reference_length) FROM cannabis_reference);

@@ -1,0 +1,1 @@
+SELECT u.display_name FROM users u JOIN answers a ON u.id = a.user_id WHERE u.reputation > 10

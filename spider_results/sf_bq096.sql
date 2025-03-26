@@ -1,0 +1,1 @@
+SELECT YEAR(date) AS year, MIN(date) AS earliest_date FROM sightings WHERE species = 'Sterna paradisaea' AND latitude > 40 GROUP BY YEAR(date) HAVING COUNT(*) > 10

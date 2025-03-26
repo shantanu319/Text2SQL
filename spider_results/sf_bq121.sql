@@ -1,0 +1,1 @@
+SELECT AVG(reputation), COUNT(*) FROM Users WHERE YEAR(joined) <= 2021 AND MONTH(joined) <= 9

@@ -1,0 +1,1 @@
+SELECT d.id, d.name, COUNT(m.movie_id) AS num_movies, ROUND(AVG(DATEDIFF(m1.release_date, m2.release_date)), 0) AS avg_inter_movie_duration, AVG(r.rating) AS avg_rating, SUM(v.vote_count) AS total_votes, MIN(r.rating) AS min_rating, MAX(r.rating) AS max_rating, SUM(DATEDIFF(m.release_date, '1970-01-01'))/60/60/24 AS total_movie_duration

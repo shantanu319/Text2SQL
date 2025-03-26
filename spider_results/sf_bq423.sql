@@ -1,0 +1,1 @@
+SELECT url FROM ad WHERE

@@ -1,0 +1,1 @@
+SELECT d.full_name AS Driver_Name, c.name AS Constructor_Name, y.year, SUM(p.points) AS Total_Points

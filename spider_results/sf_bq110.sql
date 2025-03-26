@@ -1,0 +1,1 @@
+SELECT CO.region, (SUM(CASE WHEN year = '2018' THEN homeless_veterans ELSE NULL END) - SUM(CASE WHEN year = '2012' THEN homeless_veterans ELSE NULL END)) AS homeless_veterans_change

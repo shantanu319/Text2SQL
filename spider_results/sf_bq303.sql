@@ -1,0 +1,1 @@
+SELECT u.id AS user_id, q.tags AS question_tags

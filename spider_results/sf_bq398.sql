@@ -1,0 +1,1 @@
+SELECT TOP 3 * FROM Debt_Indicators WHERE Country = 'Russia' ORDER BY Value DESC

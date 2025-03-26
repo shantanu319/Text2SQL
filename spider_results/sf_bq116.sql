@@ -1,0 +1,1 @@
+SELECT stprba AS State, SUM(revenue) AS Total_Revenue FROM your_table WHERE

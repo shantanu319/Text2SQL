@@ -1,0 +1,1 @@
+SELECT AVG(total_spending) AS median FROM (

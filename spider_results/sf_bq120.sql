@@ -1,0 +1,1 @@
+SELECT region_name, COUNT(*) as total_snap_participants, SUM(CASE WHEN household_income < 20000 THEN 1 ELSE 0 END) / COUNT(*) as ratio_under_20k

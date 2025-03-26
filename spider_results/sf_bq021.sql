@@ -1,0 +1,1 @@
+SELECT r.route_name, s.start_station_name, ROUND(AVG(b.duration), 3) AS avg_bike_duration FROM routes r JOIN stations s ON r.station_id = s.id JOIN trips t ON r.id = t.route_id JOIN bikes b ON t.bike_id = b.id WHERE

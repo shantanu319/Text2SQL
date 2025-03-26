@@ -1,0 +1,1 @@
+SELECT state_name, SUM(vulnerable_wholesale_trade_workers) AS vulnerable_wholesale_trade_workers,

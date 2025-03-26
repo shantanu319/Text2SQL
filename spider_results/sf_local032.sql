@@ -1,0 +1,1 @@
+SELECT seller_id, COUNT(DISTINCT customer_id) AS num_customers, SUM(profit) AS total_profit, COUNT(DISTINCT order_id) AS num_orders, AVG(rating) AS avg_rating

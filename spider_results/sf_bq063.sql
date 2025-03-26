@@ -1,0 +1,1 @@
+SELECT url FROM npm_package WHERE name NOT LIKE '%@%' AND

@@ -1,0 +1,1 @@
+SELECT country, SUM(cases) AS total_cases, (SUM(population) / 100000) * 100000 AS cases_per_100k FROM covid_data WHERE country IN ('United States', 'France', 'China', 'Italy', 'Spain', 'Germany', 'Iran') AND date = '2020-04-20'

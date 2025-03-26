@@ -1,0 +1,1 @@
+SELECT AVG(session_count) FROM (

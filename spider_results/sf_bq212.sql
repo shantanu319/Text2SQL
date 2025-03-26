@@ -1,0 +1,1 @@
+SELECT p.publication_number, p.ipc4_code FROM patents p WHERE p.patent_type = 'utility' AND p.country = 'United States' AND p.classification = 'B2' AND p.grant_date BETWEEN '2022-06-01' AND '2022-09-30' GROUP BY p.publication_number, p.ipc4_code HAVING COUNT(*) >= 10

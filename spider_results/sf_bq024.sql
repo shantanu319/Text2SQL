@@ -1,0 +1,1 @@
+SELECT e.group_name, e.evaluation_type, c.condition_status_code, e.description, s.state_code, p.macroplot_acres, p.subplot_acres

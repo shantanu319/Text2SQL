@@ -1,0 +1,1 @@
+SELECT * FROM user_engagement WHERE timestamp BETWEEN '2023-06-01 00:00:00' AND '2023-06-01 01:00:00';

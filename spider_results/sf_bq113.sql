@@ -1,0 +1,1 @@
+SELECT county_name, (MAX(employment_3rd_quarter_2018) - MIN(employment_3rd_quarter_2000)) / MIN(employment_3rd_quarter_2000) * 100 AS percent_increase

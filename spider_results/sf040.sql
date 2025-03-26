@@ -1,0 +1,1 @@
+SELECT address_number, street_name, address_type FROM addresses WHERE state = 'Florida' AND zip_code_area IN (SELECT zip_code_area FROM zip_codes WHERE latitude > 27.98) ORDER BY latitude ASC LIMIT 10

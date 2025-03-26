@@ -1,0 +1,1 @@
+SELECT DISTINCT c.case_id, c.clone_id

@@ -1,0 +1,1 @@
+SELECT (COUNT(DISTINCT CASE WHEN u.visit_time >= '2016-08-01' AND u.visit_time <= '2017-04-30' THEN u.user_id END) / COUNT(DISTINCT CASE WHEN u.visit_time >= '2016-08-01' AND u.visit_time <= '2017-04-30' THEN u.user_id END)) * 100 AS percentage

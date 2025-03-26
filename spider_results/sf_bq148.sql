@@ -1,0 +1,1 @@
+SELECT gene_name, fpkm_uq_unstranded FROM (

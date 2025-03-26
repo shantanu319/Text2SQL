@@ -1,0 +1,1 @@
+SELECT (SUM(CASE WHEN date BETWEEN '2024-01-01' AND '2024-06-30' THEN close_price END) / SUM(close_price)) * 100 AS percent_change

@@ -1,0 +1,1 @@
+SELECT YEAR(film_release_year), COUNT(*) AS total_films, SUM(CASE WHEN actor_gender = 'Female' THEN 1 ELSE 0 END) / COUNT(*) * 100 AS proportion_female_actor_only

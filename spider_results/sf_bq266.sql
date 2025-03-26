@@ -1,0 +1,1 @@
+SELECT product_name FROM products WHERE MONTH(sales_date) = 1 AND YEAR(sales_date) = 2020 ORDER BY sales_date

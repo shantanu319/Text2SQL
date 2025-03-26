@@ -1,0 +1,1 @@
+SELECT * FROM bike_trips WHERE start_zip_code IN (SELECT zip_code FROM weather_stations WHERE station_id = '94728' AND date = '2015-07-15')

@@ -1,0 +1,1 @@
+SELECT r.name FROM repositories r JOIN files f ON r.id = f.repository_id WHERE f.language = 'Swift' AND f.is_binary = 0 GROUP BY f.file_id ORDER BY COUNT(*) DESC LIMIT 1

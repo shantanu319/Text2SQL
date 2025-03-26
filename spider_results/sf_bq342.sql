@@ -1,0 +1,1 @@
+SELECT AVG(hourly_change) FROM (

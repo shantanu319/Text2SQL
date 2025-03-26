@@ -1,0 +1,1 @@
+SELECT p.port_name, s.state_name, COUNT(DISTINCT t.name) AS num_storms, GROUP_CONCAT(DISTINCT t.name ORDER BY t.name SEPARATOR ', ') AS storm_names, AVG(t.category) AS avg_category, AVG(t.wind_speed) AS avg_wind_speed, ST_AsGeoJSON(p.geometry) AS port_geometry, ST_AsGeoJSON(t.geometry) AS storm_area

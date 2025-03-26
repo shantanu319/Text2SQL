@@ -1,0 +1,1 @@
+SELECT COUNT(DISTINCT user_id) / (SELECT COUNT(*) FROM user_cohort WHERE first_purchase_date BETWEEN '2020-01-01' AND '2020-12-31')

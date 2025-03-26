@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM debt_indicators WHERE country = 'Russia' AND value = 0

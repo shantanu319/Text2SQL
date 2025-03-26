@@ -1,0 +1,1 @@
+SELECT YEAR, COUNT(*) as count FROM accidents GROUP BY YEAR HAVING COUNT(*) > 1

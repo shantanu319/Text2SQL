@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM publications WHERE publication_type = 'U.S.' AND year BETWEEN 2008 AND 2022 AND MONTH(filing_date) IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)

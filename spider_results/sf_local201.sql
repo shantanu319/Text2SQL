@@ -1,0 +1,1 @@
+SELECT word, COUNT(*) as num_anagrams FROM (

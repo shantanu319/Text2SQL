@@ -1,0 +1,1 @@
+SELECT AVG(first_round), AVG(last_round) FROM (

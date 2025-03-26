@@ -1,0 +1,1 @@
+SELECT AVG(score) FROM board_types WHERE date = 'September 15, 2018'

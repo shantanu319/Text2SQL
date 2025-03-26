@@ -1,0 +1,1 @@
+SELECT item_name, (total_sales_revenue_2023 - total_sales_revenue_2022) / total_sales_revenue_2022 * 100 AS year_over_year_growth_percentage

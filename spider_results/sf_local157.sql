@@ -1,0 +1,1 @@
+SELECT ticker, date, (volume - LAG(volume) OVER (PARTITION BY ticker ORDER BY date)) / LAG(volume) OVER (PARTITION BY ticker ORDER BY date) * 100 AS daily_percentage_change FROM bitcoin_prices WHERE date BETWEEN '2021-08-01' AND '2021-08-10';

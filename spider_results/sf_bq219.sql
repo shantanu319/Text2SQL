@@ -1,0 +1,1 @@
+SELECT category1, category2 FROM (

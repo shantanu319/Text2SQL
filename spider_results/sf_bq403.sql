@@ -1,0 +1,1 @@
+SELECT year, ABS(median_revenue - median_expenses) AS diff FROM (

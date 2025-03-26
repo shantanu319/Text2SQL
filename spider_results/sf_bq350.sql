@@ -1,0 +1,1 @@
+SELECT drug_id, drug_type, withdrawal_status FROM molecules WHERE drug_type IN ('Keytruda', 'Vioxx', 'Premarin', 'Humira') AND black_box_warning = 1

@@ -1,0 +1,1 @@
+SELECT country, SUM(migration) AS total_migration FROM data WHERE area > 500 GROUP BY country ORDER BY total_migration DESC LIMIT 3

@@ -1,0 +1,1 @@
+SELECT cytoband_name FROM t_cytogenetic_data WHERE chromosome = '1' AND study_id IN (SELECT id FROM t_study WHERE name LIKE '%TCGA-KIRC%')

@@ -1,0 +1,1 @@
+SELECT publication_number FROM patents WHERE filing_year = 2018 AND similarity_score > 0.5

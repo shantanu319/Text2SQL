@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM patents WHERE year = 2010 AND num_citations <= 10

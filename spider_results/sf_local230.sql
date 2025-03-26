@@ -1,0 +1,1 @@
+SELECT d.name, COUNT(*) as film_count FROM director d JOIN movie m ON d.id = m.director_id WHERE m.rating > 8 GROUP BY d.name ORDER BY film_count DESC LIMIT 4

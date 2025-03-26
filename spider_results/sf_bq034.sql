@@ -1,0 +1,1 @@
+SELECT id, name FROM weather_stations WHERE ST_Distance_Sphere(location, POINT(-87.6847, 41.8319)) <= 50

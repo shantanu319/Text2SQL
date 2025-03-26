@@ -1,0 +1,1 @@
+SELECT email FROM users WHERE registration_year = 2019 AND purchase_year = 2019 ORDER BY (SUM(items * price) / COUNT(order_id)) DESC LIMIT 10

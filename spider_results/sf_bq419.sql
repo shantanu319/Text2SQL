@@ -1,0 +1,1 @@
+SELECT state_abbr, COUNT(*) as num_events FROM storm_events WHERE YEAR >= 1980 AND YEAR <= 1995 GROUP BY state_abbr ORDER BY num_events DESC LIMIT 5

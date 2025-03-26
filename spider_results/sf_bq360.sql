@@ -1,0 +1,1 @@
+SELECT TOP 10 sp.specialization, COUNT(DISTINCT npi) as count_of_npis

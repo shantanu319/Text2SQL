@@ -1,0 +1,1 @@
+SELECT drg_definition, COUNT(*) as num_discharges, SUM(weighted_total_payments) as weighted_total_payments FROM

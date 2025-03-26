@@ -1,0 +1,1 @@
+SELECT d.name, t.symbol, c.url

@@ -1,0 +1,1 @@
+SELECT p.category, SUM(o.revenue) AS total_revenue FROM products p JOIN orders o ON p.id = o.product_id WHERE o.status IN ('completed', 'shipped') AND o.order_date >= (SELECT MIN(order_date) FROM orders WHERE status NOT IN ('cancelled', 'refunded')) GROUP BY p.category ORDER BY total_revenue DESC LIMIT 1

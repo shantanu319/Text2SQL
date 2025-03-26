@@ -1,0 +1,1 @@
+SELECT p.name, p.version FROM npm_package p JOIN (

@@ -1,0 +1,1 @@
+SELECT package_name, COUNT(*) as count FROM (

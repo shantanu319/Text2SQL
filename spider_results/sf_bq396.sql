@@ -1,0 +1,1 @@
+SELECT state, MAX(accidents) - MIN(accidents) AS difference FROM (

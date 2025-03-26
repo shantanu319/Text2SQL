@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM PageViews WHERE date = '2021-01-02' AND p_type = 'PDP';

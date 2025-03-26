@@ -1,0 +1,1 @@
+SELECT d.name AS Division, p.name AS Product, AVG(s.quantity_sold) AS Average_Sales FROM sales s JOIN product p ON s.product_id = p.id JOIN division d ON s.division_id = d.id WHERE YEAR(s.date) = 2021 GROUP BY d.name, p.name ORDER BY

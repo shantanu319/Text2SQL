@@ -1,0 +1,1 @@
+SELECT n.name, COUNT(b.id) AS num_bike_share_stations, COUNT(c.id) AS num_crime_incidents

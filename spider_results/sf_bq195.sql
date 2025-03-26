@@ -1,0 +1,1 @@
+SELECT address FROM ethereum_transactions WHERE timestamp < '2021-09-01' AND (type = 'value' OR type IS NULL)

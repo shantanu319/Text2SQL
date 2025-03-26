@@ -1,0 +1,1 @@
+SELECT postal_code, DATE_FORMAT(date, '%Y-%m-%d'), snowfall_amount FROM weather_data WHERE

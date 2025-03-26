@@ -1,0 +1,1 @@
+SELECT AVG(loss_rate) AS avg_loss_rate, COUNT(*) - SUM(CASE WHEN loss_rate < (AVG(loss_rate) - 1 * STDDEV(loss_rate)) THEN 0 ELSE 1 END) AS below_avg_count, COUNT(*) - SUM(CASE WHEN loss_rate > (AVG(loss_rate) + 1 * STDDEV(loss_rate)) THEN 0 ELSE 1 END) AS above_avg_count FROM veg_whse_data

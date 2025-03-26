@@ -1,0 +1,1 @@
+SELECT COUNT(*) / (COUNT(*) * 1000) AS vaccine_sites_per_1000_people

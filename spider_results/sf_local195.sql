@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM customer WHERE film_id IN (

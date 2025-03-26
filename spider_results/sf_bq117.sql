@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM StormEvents WHERE Year >= 2006 AND Year <= 2020 AND PropertyDamage > 0

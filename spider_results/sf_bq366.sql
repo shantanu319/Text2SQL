@@ -1,0 +1,1 @@
+SELECT period, label, COUNT(*) as count FROM artworks WHERE label IN (SELECT label FROM artworks GROUP BY label HAVING COUNT(*) >= 500)

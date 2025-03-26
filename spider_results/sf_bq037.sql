@@ -1,0 +1,1 @@
+SELECT MIN(start_position) AS min_start_position, MAX(start_position) AS max_start_position FROM table_name WHERE base = 'AT';

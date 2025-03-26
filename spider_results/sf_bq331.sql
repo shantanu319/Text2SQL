@@ -1,0 +1,1 @@
+SELECT u.username, ABS(m.score - (SELECT AVG(score) FROM messages WHERE topic_id = m.topic_id)) AS diff

@@ -1,0 +1,1 @@
+SELECT AVG(log2(h4/h3)), VAR_POP(log2(h4/h3)), MAX(log2(h4/h3)) - MIN(log2(h4/h3)),

@@ -1,0 +1,1 @@
+SELECT ROUND((AVG(log10(normalized_count+1)) - AVG(log10(normalized_count+1))) / SQRT(2 * VAR_SAMP(log10(normalized_count+1))), 2)

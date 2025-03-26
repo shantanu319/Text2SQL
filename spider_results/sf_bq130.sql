@@ -1,0 +1,1 @@
+SELECT state, COUNT(*) as count FROM covid_cases WHERE date BETWEEN '2020-03-01' AND '2020-05-31' GROUP BY state ORDER BY count DESC

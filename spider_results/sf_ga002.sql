@@ -1,0 +1,1 @@
+SELECT product_name, SUM(quantity) FROM orders WHERE customer_id IN (SELECT customer_id FROM orders WHERE order_date BETWEEN '2020-11-01' AND '2020-12-31') GROUP BY product_name

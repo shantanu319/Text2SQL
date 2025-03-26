@@ -1,0 +1,1 @@
+SELECT p.name, b.brand, c.category, SUM(o.quantity * p.price) AS total_sales, SUM(o.quantity * p.price * o.discount) AS total_revenue, MONTH(o.order_date) AS month, o.status

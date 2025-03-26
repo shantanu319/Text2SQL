@@ -1,0 +1,1 @@
+SELECT YEAR(date) AS Year, COUNT(*) AS Total_Thefts FROM incidents WHERE category = 'Theft and Handling' AND subcategory = 'Other Theft';

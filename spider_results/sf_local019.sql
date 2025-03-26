@@ -1,0 +1,1 @@
+SELECT w1.name, w2.name FROM wrestler w1 JOIN wrestler w2 ON w1.title = w2.title

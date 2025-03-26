@@ -1,0 +1,1 @@
+SELECT borough, COUNT(*) AS total_stations, SUM(CASE WHEN entrances LIKE '%actual%entry%' AND entrances LIKE '%ADA-compliant%' THEN 1 ELSE 0 END) AS compliant_entrances, (SUM(CASE WHEN entrances LIKE '%actual%entry%' AND entrances LIKE '%ADA-compliant%' THEN 1 ELSE 0 END) / COUNT(*)) * 100 AS percentage

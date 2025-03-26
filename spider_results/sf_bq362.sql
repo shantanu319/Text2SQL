@@ -1,0 +1,1 @@
+SELECT company, SUM(trip_number) FROM trips WHERE year = 2018 GROUP BY company ORDER BY SUM(trip_number) DESC LIMIT 3

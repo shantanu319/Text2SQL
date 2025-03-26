@@ -1,0 +1,1 @@
+SELECT id, month_number FROM users WHERE

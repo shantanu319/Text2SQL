@@ -1,0 +1,1 @@
+SELECT * FROM dicom_all WHERE image_type = 'SM' AND collection IN ('TCGA-LUAD', 'TCGA-LUSC') AND compression_type != 'other' AND specimen_preparation_step LIKE '%Embedding medium%' AND (tissue_type = 'normal' OR tissue_type = 'tumor')

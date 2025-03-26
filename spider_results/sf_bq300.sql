@@ -1,0 +1,1 @@
+SELECT MAX(answer_count) FROM questions WHERE language = 'Python 2' AND version = 'specific';

@@ -1,0 +1,1 @@
+SELECT p.product_id, a.aisle, o.position FROM orders o JOIN order_lines ol ON o.order_id = ol.order_id JOIN products p ON ol.product_id = p.product_id JOIN aisles a ON p.aisle_id = a.aisle_id WHERE o.order_id = 423

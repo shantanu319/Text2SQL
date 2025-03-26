@@ -1,0 +1,1 @@
+SELECT sample_name, COUNT(*) as count

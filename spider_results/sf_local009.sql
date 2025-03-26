@@ -1,0 +1,1 @@
+SELECT MAX(distance) FROM routes WHERE (departure = 'Abakan' OR destination = 'Abakan');

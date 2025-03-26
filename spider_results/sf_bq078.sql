@@ -1,0 +1,1 @@
+SELECT approved_symbol FROM gene_association WHERE disease_id = (SELECT id FROM disease WHERE efo_id = 'EFO_0000676') AND overall_score IS NOT NULL ORDER BY overall_score DESC LIMIT 1;

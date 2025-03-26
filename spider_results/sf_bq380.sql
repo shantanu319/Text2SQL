@@ -1,0 +1,1 @@
+SELECT u.Username, COUNT(DISTINCT m.ToUserId) AS UpvoteCountReceived, COUNT(DISTINCT m.FromUserId) AS UpvoteCountGiven

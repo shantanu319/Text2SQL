@@ -1,0 +1,1 @@
+SELECT university_name, COUNT(*) as peak_performance_seasons FROM

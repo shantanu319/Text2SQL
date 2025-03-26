@@ -1,0 +1,1 @@
+SELECT u.user_id, SUM(p.clicks) as total_clicks

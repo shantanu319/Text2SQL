@@ -1,0 +1,1 @@
+SELECT state_abbreviation FROM legislators WHERE gender = 'female' AND

@@ -1,0 +1,1 @@
+SELECT module_name, COUNT(*) as frequency

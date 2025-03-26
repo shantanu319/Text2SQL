@@ -1,0 +1,1 @@
+SELECT bowler, MIN(avg_wkts) as min_avg_wkts FROM bowling_stats

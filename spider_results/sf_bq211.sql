@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM patents WHERE year BETWEEN 2010 AND 2023 AND country = 'CN'

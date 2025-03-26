@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM accidents WHERE accident_date BETWEEN '2015-01-01' AND '2015-08-31' AND num_people > 1 AND injury_severity > 3

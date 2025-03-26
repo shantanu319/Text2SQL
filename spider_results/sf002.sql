@@ -1,0 +1,1 @@
+SELECT bank_name, percent_uninsured_assets

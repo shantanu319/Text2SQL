@@ -1,0 +1,1 @@
+SELECT DISTINCT StudyInstanceUID FROM qin_prostate_repeatability WHERE SeriesDescription LIKE '%T2-weighted%axial%' AND SegmentLabel = 'Peripheral zone';

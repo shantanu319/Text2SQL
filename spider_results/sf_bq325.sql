@@ -1,0 +1,1 @@
+SELECT g.name AS gene_name, v.variant_id

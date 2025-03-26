@@ -1,0 +1,1 @@
+SELECT e.stage_name, c.last_name

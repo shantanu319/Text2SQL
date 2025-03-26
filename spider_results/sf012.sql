@@ -1,0 +1,1 @@
+SELECT YEAR(date) AS Year, SUM(total_building_damage_amount) AS Total_Building_Damage_Amount, SUM(total_contents_damage_amount) AS Total_Contents_Damage_Amount FROM nfip_data WHERE community_name = 'City Of New York' AND YEAR(date) BETWEEN 2010 AND 2019 GROUP BY YEAR(date);

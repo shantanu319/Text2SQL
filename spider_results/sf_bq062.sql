@@ -1,0 +1,1 @@
+SELECT package_name, COUNT(*) as frequency FROM packages GROUP BY package_name ORDER BY frequency DESC

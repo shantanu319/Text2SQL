@@ -1,0 +1,1 @@
+SELECT zip_code, state_abbreviation, growth_rate FROM census_zip_codes WHERE year BETWEEN 2015 AND 2020 AND population_estimate >= 25000 ORDER BY growth_rate DESC LIMIT 1

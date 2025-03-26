@@ -1,0 +1,1 @@
+SELECT * FROM targets WHERE approved_symbol = (

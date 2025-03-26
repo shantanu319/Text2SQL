@@ -1,0 +1,1 @@
+SELECT p.id, p.name, r.role, b.hand, b.skill, s.runs, m.matches_played, d.dismissals, ba.batting_average, hs.highest_score, c.matches_with_30_runs, c.matches_with_50_runs, c.matches_with_100_runs, t.balls_faced, sr.strike_rate, w.wickets_taken, e.economy_rate, bp.best_performance

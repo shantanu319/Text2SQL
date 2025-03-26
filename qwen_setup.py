@@ -320,124 +320,169 @@ def compare_results(result1, result2):
     return set1 == set2
 
 def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_results"):
+    """
+    Process Spider2-snow dataset using the finetuned model and evaluate with official evaluation scripts.
+    
+    Args:
+        model: The fine-tuned model
+        tokenizer: The tokenizer corresponding to the model
+        spider_dir: Directory containing the Spider dataset files
+        output_dir: Directory to save prediction results
+    
+    Returns:
+        Dictionary with predictions and evaluation metrics
+    """
+    import json
+    import os
+    import sys
+    import subprocess
+    
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
-    predictions_file = os.path.join(output_dir, "spider_predictions.json")
     
-    # Look for the Spider evaluation suite in common paths
-    eval_suite_paths = [
-        os.path.join(spider_dir, "Spider2/spider2/evaluation_suite"),
-        os.path.join(spider_dir, "Spider2/spider2-lite/evaluation_suite"),
-        os.path.join(spider_dir, "Spider2/spider2-snow/evaluation_suite")
-    ]
+    # Path to the Spider2-snow evaluation suite
+    eval_suite_path = os.path.join(spider_dir, "Spider2", "spider2-snow", "evaluation_suite")
     
-    eval_suite_path = None
-    for path in eval_suite_paths:
-        if os.path.exists(path):
-            eval_suite_path = path
-            break
+    # Check if evaluation suite exists
+    if not os.path.exists(eval_suite_path):
+        print(f"Spider2-snow evaluation suite not found at {eval_suite_path}")
+        # Try alternative path
+        eval_suite_path = "/home/ubuntu/ShantanuK/txt2sql_461/Spider2/spider2-snow/evaluation_suite"
+        if not os.path.exists(eval_suite_path):
+            print(f"Spider2-snow evaluation suite not found at {eval_suite_path} either")
+            return None
+        else:
+            print(f"Found evaluation suite at {eval_suite_path}")
     
-    # Search for Spider dataset files (look for any spider-related jsonl files)
-    spider_files = []
-    for root, dirs, files in os.walk(spider_dir):
-        for file in files:
-            if file.endswith('.jsonl') and ('spider' in file.lower() or 'eval' in file.lower()):
-                spider_files.append(os.path.join(root, file))
-    
-    if not spider_files:
-        print("No Spider dataset files found.")
+    # Load the Spider2-snow dataset file
+    spider_snow_file = os.path.join(os.path.dirname(eval_suite_path), "spider2-snow.jsonl")
+    if not os.path.exists(spider_snow_file):
+        print(f"Spider2-snow dataset file not found at {spider_snow_file}")
         return None
     
-    all_predictions = []
-    results_metadata = []
+    # Load examples from the JSONL file
+    examples = []
+    with open(spider_snow_file, 'r') as f:
+        for line in f:
+            example = json.loads(line.strip())
+            examples.append(example)
     
-    print(f"Found {len(spider_files)} Spider dataset files.")
-    for file_path in spider_files:
-        print(f"Processing file: {os.path.basename(file_path)}")
-        with open(file_path, 'r') as f:
-            for line in f:
-                example = json.loads(line.strip())
-                # Use the "question" field if available; otherwise, fallback to "instruction"
-                question = example.get('question', example.get('instruction', ''))
-                # Use "db_id" if available; otherwise "instance_id", or generate an id
-                instance_id = example.get('db_id', example.get('instance_id', ''))
-                if not instance_id:
-                    instance_id = f"instance_{len(all_predictions)}"
+    print(f"Loaded {len(examples)} examples from Spider2-snow dataset")
+    
+    # Generate predictions for each example
+    for example in examples:
+        instance_id = example["instance_id"]
+        question = example["instruction"]
+        
+        # Skip if the example already has a prediction
+        sql_file_path = os.path.join(output_dir, f"{instance_id}.sql")
+        if os.path.exists(sql_file_path):
+            print(f"Prediction for {instance_id} already exists, skipping...")
+            continue
+        
+        # Generate SQL for the question
+        generated_sql = generate_sql_from_prompt(model, tokenizer, question)
+        
+        # Save the prediction as an SQL file
+        with open(sql_file_path, 'w') as f:
+            f.write(generated_sql)
+            
+        print(f"Generated SQL for {instance_id}")
+    
+    # Run the evaluation using Spider2-snow evaluation script
+    gold_dir = os.path.join(eval_suite_path, "gold")
+    eval_script = os.path.join(eval_suite_path, "evaluate.py")
+    
+    if not os.path.exists(eval_script):
+        print(f"Evaluation script not found at {eval_script}")
+        return {"predictions": examples, "evaluation_metrics": {}}
+    
+    print(f"Found evaluation script at {eval_script}")
+    print(f"Using gold directory: {gold_dir}")
+    print(f"Using result directory: {os.path.abspath(output_dir)}")
+    
+    # Prepare the evaluation command
+    cmd = [
+        sys.executable,
+        eval_script,
+        "--mode", "sql",
+        "--result_dir", os.path.abspath(output_dir),
+        "--gold_dir", gold_dir
+    ]
+    
+    # Run the evaluation
+    print("Running Spider2-snow evaluation with command:")
+    print(" ".join(cmd))
+    try:
+        completed_process = subprocess.run(
+            cmd, 
+            check=True, 
+            capture_output=True, 
+            text=True
+        )
+        print("Evaluation completed successfully.")
+        print(completed_process.stdout)
+        
+        # Parse evaluation results from the stdout
+        # The evaluation script prints scores in the format "Final score: X.XX, Correct examples: Y, Total examples: Z"
+        eval_metrics = {}
+        for line in completed_process.stdout.split('\n'):
+            if line.startswith("Final score:"):
+                parts = line.split(",")
+                if len(parts) >= 3:
+                    score_part = parts[0].strip()
+                    correct_part = parts[1].strip()
+                    total_part = parts[2].strip()
+                    
+                    eval_metrics["execution_accuracy"] = float(score_part.split(":")[1].strip())
+                    eval_metrics["correct_examples"] = int(correct_part.split(":")[1].strip())
+                    eval_metrics["total_examples"] = int(total_part.split(":")[1].strip())
+        
+        # If log.txt was created (as per the TeeOutput in evaluate.py), read detailed results from there
+        log_file = os.path.join(os.getcwd(), "log.txt")
+        if os.path.exists(log_file):
+            with open(log_file, 'r') as f:
+                log_content = f.read()
+                eval_metrics["detailed_log"] = log_content
+        
+        print("Evaluation Metrics:")
+        for key, value in eval_metrics.items():
+            if key != "detailed_log":  # Skip printing the detailed log
+                print(f"{key}: {value}")
                 
-                if question:
-                    generated_sql = generate_sql_from_prompt(model, tokenizer, question)
-                    
-                    prediction = {
-                        "instance_id": instance_id,
-                        "question": question,
-                        "predicted_sql": generated_sql
-                    }
-                    all_predictions.append(prediction)
-                    
-                    # Save individual prediction for the evaluation suite
-                    instance_dir = os.path.join(output_dir, instance_id)
-                    os.makedirs(instance_dir, exist_ok=True)
-                    sql_file_path = os.path.join(instance_dir, "pred.sql")
-                    with open(sql_file_path, 'w') as sql_file:
-                        sql_file.write(generated_sql)
-                    
-                    results_metadata.append({
-                        "instance_id": instance_id,
-                        "answer_type": "file",
-                        "answer_or_path": "pred.sql"
-                    })
-    
-    # Save all predictions to a JSON file
-    with open(predictions_file, 'w') as f:
-        json.dump(all_predictions, f, indent=2)
-    
-    # Save metadata required by the evaluation suite (each line is a JSON object)
-    results_metadata_file = os.path.join(output_dir, "results_metadata.jsonl")
-    with open(results_metadata_file, 'w') as f:
-        for item in results_metadata:
-            f.write(json.dumps(item) + '\n')
-    
-    print(f"Processed {len(all_predictions)} examples, predictions saved to {predictions_file}")
-    
-    eval_metrics = {}
-    # Run the evaluation if the Spider evaluation suite is found
-    if eval_suite_path:
-        print(f"Found Spider evaluation suite at {eval_suite_path}")
-        gold_dir = os.path.join(eval_suite_path, "gold")
-        if os.path.exists(gold_dir):
-            print("Running Spider evaluation...")
-            eval_script = os.path.join(eval_suite_path, "evaluate.py")
-            if os.path.exists(eval_script):
-                result_file = os.path.join(output_dir, "evaluation_results.json")
-                cmd = [
-                    sys.executable, 
-                    eval_script, 
-                    "--result_dir", output_dir, 
-                    "--gold_dir", gold_dir,
-                    "--outfile", result_file  # Pass outfile if supported by the evaluation suite
-                ]
-                try:
-                    completed = subprocess.run(cmd, check=True, capture_output=True, text=True)
-                    print("Evaluation completed successfully.")
-                    if os.path.exists(result_file):
-                        with open(result_file, 'r') as rf:
-                            eval_metrics = json.load(rf)
-                        print("Evaluation Metrics:")
-                        for key, value in eval_metrics.items():
-                            print(f"{key}: {value}")
-                    else:
-                        print("Evaluation results file not found.")
-                except subprocess.CalledProcessError as e:
-                    print("Error running evaluation suite:")
-                    print(e.stderr)
-            else:
-                print("Evaluation script not found in the evaluation suite.")
-        else:
-            print(f"Gold directory not found at {gold_dir}")
-    else:
-        print("Spider evaluation suite not found. Skipping evaluation.")
-    
-    return {"predictions": all_predictions, "evaluation_metrics": eval_metrics}
-
+        # Create a dictionary with all results
+        results = {
+            "predictions": examples,
+            "evaluation_metrics": eval_metrics
+        }
+        
+        # Save the results to a JSON file
+        predictions_file = os.path.join(os.getcwd(), "spider_predictions.json")
+        with open(predictions_file, 'w') as f:
+            json.dump(results, f, indent=2)
+            
+        print(f"Processed {len(examples)} examples, predictions saved to spider_predictions.json")
+                
+        return results
+        
+    except subprocess.CalledProcessError as e:
+        print("Error running evaluation suite:")
+        print(e.stderr)
+        
+        # Create a dictionary with all results including the error
+        results = {
+            "predictions": examples,
+            "evaluation_metrics": {"error": e.stderr}
+        }
+        
+        # Save the results to a JSON file even if there was an error
+        predictions_file = os.path.join(os.getcwd(), "spider_predictions.json")
+        with open(predictions_file, 'w') as f:
+            json.dump(results, f, indent=2)
+            
+        print(f"Processed {len(examples)} examples, predictions saved to spider_predictions.json")
+        
+        return results
 
 def main():
     # using cl args
@@ -520,10 +565,6 @@ def main():
                 print("Spider Evaluation Metrics:")
                 for key, value in metrics.items():
                     print(f"{key}: {value}")
-    
-    else:
-        print(f"Unknown action: {action}")
-        print("Usage: python qwen_setup.py [finetune|evaluate|process_spider]")
 
 if __name__ == "__main__":
     main()

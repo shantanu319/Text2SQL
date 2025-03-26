@@ -1,0 +1,1 @@
+SELECT t.transaction_id, t.total_item_quantity, p.purchase_revenue_usd, p.purchase_revenue_usd

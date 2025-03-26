@@ -1,0 +1,1 @@
+SELECT d.name, AVG(d.daily_deliveries) as avg_daily_deliveries

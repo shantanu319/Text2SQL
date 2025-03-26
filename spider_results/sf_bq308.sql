@@ -1,0 +1,1 @@
+SELECT DATE(creation_date) AS date, COUNT(*) AS total_questions, SUM(CASE WHEN answer_count <= 1 THEN 1 ELSE 0 END) AS answered_within_one_hour

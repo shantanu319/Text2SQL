@@ -1,0 +1,1 @@
+SELECT quickplay_event_type FROM quickplay_events WHERE

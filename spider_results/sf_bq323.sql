@@ -1,0 +1,1 @@
+SELECT AVG(RepetitionTime), AVG(EchoTime), AVG(SliceThickness) FROM (

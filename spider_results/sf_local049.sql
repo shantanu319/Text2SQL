@@ -1,0 +1,1 @@
+SELECT AVG(num_new_companies) FROM (

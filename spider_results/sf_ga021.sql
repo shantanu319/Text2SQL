@@ -1,0 +1,1 @@
+SELECT q.event_type, COUNT(DISTINCT u.user_id) /

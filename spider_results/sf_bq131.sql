@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM bus_stops WHERE bus_network_id IN (

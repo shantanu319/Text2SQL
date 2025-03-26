@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM weather_stations WHERE latitude BETWEEN 41.185 AND 41.21

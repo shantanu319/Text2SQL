@@ -1,0 +1,1 @@
+SELECT ipc_code FROM us_b2_utility_patents WHERE grant_date BETWEEN '2022-06-01' AND '2022-08-31' GROUP BY ipc_code ORDER BY COUNT(*) DESC LIMIT 1

@@ -1,0 +1,1 @@
+SELECT v.visitor_id FROM visitors v JOIN transactions t ON v.id = t.visitor_id WHERE

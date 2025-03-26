@@ -1,0 +1,1 @@
+SELECT latitude, longitude, date, AVG(wind_speed) AS avg_wind_speed FROM icoads_core WHERE wind_speed IS NOT NULL AND date BETWEEN '2005-01-01' AND '2015-12-31' GROUP BY latitude, longitude, date ORDER BY avg_wind_speed DESC LIMIT 5

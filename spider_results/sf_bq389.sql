@@ -1,0 +1,1 @@
+SELECT AVG(PM10) AS Monthly_Average_PM10,

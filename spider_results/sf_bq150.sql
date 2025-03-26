@@ -1,0 +1,5 @@
+SELECT COUNT(*) AS total_samples,
+       COUNT(DISTINCT mutation_type) AS num_mutation_types,
+       AVG(log10_transformed_tp53_expression_level) - (SELECT AVG(log10_transformed_tp53_expression_level) FROM t_c_g_a_b_r_c_samples WHERE sample_id NOT IN (SELECT DISTINCT sample_id FROM t_c_g_a_b_r_c_samples)) AS mean_square_between_groups,
+       (SELECT AVG(log10_transformed_tp53_expression_level) FROM t_c_g_a_b_r_c_samples WHERE sample_id NOT IN (SELECT DISTINCT sample_id FROM t_c_g_a_b_r_c_samples)) - (SELECT AVG(log10_transformed_tp53_expression_level) FROM t_c_g_a_b_r_c_samples) AS mean_square_within_groups,
+       (SELECT AVG(log10_transformed_tp53_expression_level) FROM t_c_g_a_b_r_c_samples WHERE sample_id NOT IN (SELECT DISTINCT sample_id FROM t_c_g_a_b_r_c_samples)) / (SELECT AVG(log10_transformed_tp53_expression_level) FROM t_c_g_a_b_r_c_samples) AS f_statistic

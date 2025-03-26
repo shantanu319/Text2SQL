@@ -1,0 +1,1 @@
+SELECT * FROM food_events WHERE date_created BETWEEN '2015-01-01' AND '2015-01-31';

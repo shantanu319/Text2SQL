@@ -1,0 +1,1 @@
+SELECT start_position, end_position, chi_squared_score

@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM commits WHERE language = 'Shell' AND license = 'apache-2.0' AND LENGTH(message) > 5 AND LENGTH(message) < 10000 AND NOT (message LIKE '% merge%' OR message LIKE '% update%' OR message LIKE '% test%');

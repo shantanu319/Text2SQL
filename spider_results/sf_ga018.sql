@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM page_views WHERE event_type = 'page_view' AND timestamp >= '2021-01-02';

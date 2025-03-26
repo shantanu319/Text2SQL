@@ -1,0 +1,1 @@
+SELECT YEAR(date) AS year, MONTH(date) AS month, MAX(count) AS max_motor_thefts

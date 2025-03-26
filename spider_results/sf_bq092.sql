@@ -1,0 +1,1 @@
+SELECT MAX(balance), MIN(balance) FROM (

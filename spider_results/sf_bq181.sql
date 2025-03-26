@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM weather_stations WHERE

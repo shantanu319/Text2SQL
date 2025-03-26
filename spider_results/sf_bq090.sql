@@ -1,0 +1,1 @@
+SELECT AVG(intrinsic_value) - (SELECT AVG(intrinsic_value) FROM trades WHERE strategy = 'momentum') AS difference

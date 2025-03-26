@@ -1,0 +1,1 @@
+SELECT u.username FROM users u JOIN forum_messages fm ON u.id = fm.user_id WHERE fm.created_at >= '2019-01-01' AND fm.created_at <= '2019-12-31' GROUP BY u.username HAVING AVG(fm.upvotes) = (SELECT AVG(upvotes) FROM forum_messages WHERE created_at BETWEEN '2019-01-01' AND '2019-12-31')

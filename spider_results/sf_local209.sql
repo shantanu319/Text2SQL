@@ -1,0 +1,1 @@
+SELECT s.store_id, COUNT(o.order_id) as total_orders

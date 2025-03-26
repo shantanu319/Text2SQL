@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM legislators WHERE (start_year BETWEEN 1917 AND 1999) AND (end_year IS NULL OR end_year >= 20);

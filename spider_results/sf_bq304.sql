@@ -1,0 +1,1 @@
+SELECT q.title, q.body FROM questions AS q JOIN (

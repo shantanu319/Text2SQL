@@ -1,0 +1,1 @@
+SELECT repo_name, SUM(watch_events) AS total_watch_events

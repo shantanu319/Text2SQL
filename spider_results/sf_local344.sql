@@ -1,0 +1,1 @@
+SELECT COUNT(*) FROM races WHERE pit_stop_data IS NOT NULL AND

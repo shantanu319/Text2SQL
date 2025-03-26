@@ -1,0 +1,1 @@
+SELECT MIN(geography::STDistance(ST_GeometryFromText('POINT(' || longitude || ' ' || latitude || ')'), ST_GeometryFromText('POINT(' || l.longitude || ' ' || l.latitude || ')'))) AS min_distance

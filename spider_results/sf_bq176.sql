@@ -1,0 +1,1 @@
+SELECT barcode FROM t_cga_laml WHERE

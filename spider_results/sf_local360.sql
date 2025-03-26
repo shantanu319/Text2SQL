@@ -1,0 +1,1 @@
+SELECT path, search_type FROM sessions WHERE (

@@ -1,0 +1,1 @@
+SELECT s.station_id, COUNT(*) as num_trips,

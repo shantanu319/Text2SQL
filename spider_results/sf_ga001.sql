@@ -1,0 +1,1 @@
+SELECT p1.product_name, SUM(p1.quantity) as total_quantity

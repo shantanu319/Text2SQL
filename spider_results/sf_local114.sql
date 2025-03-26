@@ -1,0 +1,1 @@
+SELECT r.region_name, COUNT(o.order_id) AS num_orders, SUM(o.total_sales_amount) AS total_sales_amount, s.name, s.sales_amount

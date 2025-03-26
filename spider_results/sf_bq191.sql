@@ -1,0 +1,1 @@
+SELECT r.name, COUNT(DISTINCT w.user_id) AS distinct_watchers

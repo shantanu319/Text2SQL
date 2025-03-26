@@ -1,0 +1,1 @@
+SELECT s.last_name, q.quintile_rank FROM students s JOIN

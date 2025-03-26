@@ -1,0 +1,1 @@
+SELECT c.condition_name, COUNT(DISTINCT m.medication_code) as num_medications FROM patients p JOIN conditions c ON p.patient_id = c.patient_id WHERE p.last_name LIKE 'A%' AND p.num_conditions = 1 GROUP BY c.condition_name ORDER BY num_medications DESC LIMIT 8
