@@ -1,28 +1,34 @@
-SELECT 
-    YEAR(order_date) AS year,
-    MONTH(order_date) AS month,
-    product_category,
-    SUM(CASE WHEN order_status = 'completed' THEN 1 ELSE 0 END) AS total_orders,
-    SUM(price * quantity) AS total_revenue,
-    SUM((price - cost) * quantity) AS total_profit,
-    LAG(total_orders, 1) OVER (PARTITION BY product_category ORDER BY year, month) AS previous_month_total_orders,
-    LAG(total_revenue, 1) OVER (PARTITION BY product_category ORDER BY year, month) AS previous_month_total_revenue,
-    LAG(total_profit, 1) OVER (PARTITION BY product_category ORDER BY year, month) AS previous_month_total_profit,
-    CASE 
-        WHEN previous_month_total_orders IS NULL OR previous_month_total_revenue IS NULL OR previous_month_total_profit IS NULL THEN NULL
-        ELSE ((total_orders - previous_month_total_orders) / previous_month_total_orders) * 100
-    END AS month_over_month_growth_rate_order,
-    CASE 
-        WHEN previous_month_total_revenue IS NULL OR previous_month_total_profit IS NULL THEN NULL
-        ELSE ((total_revenue - previous_month_total_revenue) / previous_month_total_revenue) * 100
-    END AS month_over_month_growth_rate_revenue,
-    CASE 
-        WHEN previous_month_total_profit IS NULL THEN NULL
-        ELSE ((total_profit - previous_month_total_profit) / previous_month_total_profit) * 100
-    END AS month_over_month_growth_rate_profit
-FROM 
-    orders
-WHERE 
-    YEAR(order_date) >= 2019 AND MONTH(order_date) BETWEEN 6 AND 12
-GROUP BY 
-    YEAR(order_date), MONTH(order_date), product_category
+To generate the required monthly analysis report for e-commerce sales, you can use the following SQL query:
+
+```sql
+WITH MonthlySales AS (
+    SELECT 
+        DATE_TRUNC('month', sale_date) AS sale_month,
+        product_category,
+        COUNT(order_id) AS total_orders,
+        SUM(sale_amount) AS total_revenue,
+        SUM(sale_amount - cost_price) AS total_profit
+    FROM 
+        sales_data
+    WHERE 
+        sale_date BETWEEN '2019-06-01' AND '2019-12-31'
+    GROUP BY 
+        DATE_TRUNC('month', sale_date), product_category
+),
+GrowthRates AS (
+    SELECT 
+        ms.sale_month,
+        ms.product_category,
+        ms.total_orders,
+        ms.total_revenue,
+        ms.total_profit,
+        COALESCE(
+            (ms.total_orders / prev_ms.total_orders) * 100,
+            NULL
+        ) AS orders_growth_rate,
+        COALESCE(
+            (ms.total_revenue / prev_ms.total_revenue) * 100,
+            NULL
+        ) AS revenue_growth_rate,
+        COALESCE(
+            (ms.total_profit / prev_ms.total_profit) * 1

@@ -1,1 +1,16 @@
-SELECT c.customer_unique_id, AVG(p.payment_value) as avg_payment_value, c.city, c.state FROM customers c JOIN orders o ON c.customer_unique_id = o.customer_unique_id GROUP BY c.customer_unique_id ORDER BY COUNT(o.order_id) DESC LIMIT 3
+```sql
+SELECT 
+    c.customer_unique_id,
+    AVG(o.payment_value) AS avg_payment_value,
+    o.city,
+    o.state
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_unique_id = o.customer_unique_id
+GROUP BY 
+    c.customer_unique_id, o.city, o.state
+ORDER BY 
+    COUNT(o.order_id) DESC
+LIMIT 3;
+```

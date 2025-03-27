@@ -12,7 +12,52 @@
   {
     "instruction": "Find the total revenue by product category.",
     "input": "Database has tables: products(id, name, price, category_id), orders(id, customer_id, order_date), order_items(order_id, product_id, quantity), categories(id, name)",
-    "output": "SELECT c.name, SUM(p.price * oi.quantity) as total_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id GROUP BY c.name;"
+    "output": "SELECT c.name, SUM(p.price * oi.quantity) as total_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id GROUP BY c.name ORDER BY total_revenue DESC;"
+  },
+  {
+    "instruction": "Get a list of all customers who have spent more than $1000 in total.",
+    "input": "Database has tables: customers(id, name, email), orders(id, customer_id, order_date, total_amount)",
+    "output": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.name HAVING SUM(o.total_amount) > 1000 ORDER BY total_spent DESC;"
+  },
+  {
+    "instruction": "List the top 5 most viewed products in the last week.",
+    "input": "Database has tables: products(id, name, price, category_id), page_views(id, product_id, user_id, view_date, duration)",
+    "output": "SELECT p.name, COUNT(pv.id) as view_count FROM products p JOIN page_views pv ON p.id = pv.product_id WHERE pv.view_date >= DATE('now', '-7 days') GROUP BY p.id, p.name ORDER BY view_count DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Find all sessions where customers viewed at least 5 pages but didn't make a purchase.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), hits(hitNumber, time, isInteraction, type, page_path), totals(visits, hits, pageviews, transactions)",
+    "output": "SELECT s.fullVisitorId, s.visitId, s.date, t.pageviews FROM ga_sessions s JOIN totals t ON s.visitId = t.visitId WHERE t.pageviews >= 5 AND (t.transactions IS NULL OR t.transactions = 0) ORDER BY t.pageviews DESC;"
+  },
+  {
+    "instruction": "Identify customers who have visited the website from both mobile and desktop devices.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), device(deviceCategory, browser, operatingSystem)",
+    "output": "SELECT s.fullVisitorId FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'mobile' INTERSECT SELECT s.fullVisitorId FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'desktop';"
+  },
+  {
+    "instruction": "Calculate the monthly sales growth percentage for each product category in 2022.",
+    "input": "Database has tables: orders(id, order_date, total_amount), order_items(order_id, product_id, quantity, item_price), products(id, name, category_id), categories(id, name)",
+    "output": "WITH monthly_sales AS (SELECT c.id, c.name, EXTRACT(MONTH FROM o.order_date) as month, SUM(oi.quantity * oi.item_price) as monthly_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id JOIN orders o ON oi.order_id = o.id WHERE EXTRACT(YEAR FROM o.order_date) = 2022 GROUP BY c.id, c.name, EXTRACT(MONTH FROM o.order_date)) SELECT m1.name, m1.month, m1.monthly_revenue, ((m1.monthly_revenue - m2.monthly_revenue) / m2.monthly_revenue) * 100 as growth_percentage FROM monthly_sales m1 JOIN monthly_sales m2 ON m1.id = m2.id AND m1.month = m2.month + 1 ORDER BY m1.name, m1.month;"
+  },
+  {
+    "instruction": "Find the average time between a user's first visit and their first purchase.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), hits(hitNumber, time, isInteraction, type), transactions(transactionId, visitId, date, totalTransactionRevenue)",
+    "output": "WITH first_visits AS (SELECT fullVisitorId, MIN(visitStartTime) as first_visit_time FROM ga_sessions GROUP BY fullVisitorId), first_purchases AS (SELECT s.fullVisitorId, MIN(t.date) as first_purchase_date FROM ga_sessions s JOIN transactions t ON s.visitId = t.visitId GROUP BY s.fullVisitorId) SELECT AVG(UNIX_TIMESTAMP(fp.first_purchase_date) - fv.first_visit_time) / 86400 as avg_days_to_purchase FROM first_visits fv JOIN first_purchases fp ON fv.fullVisitorId = fp.fullVisitorId;"
+  },
+  {
+    "instruction": "Generate a report of weekly bounce rates by traffic source for the last quarter.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), trafficSource(source, medium, campaign), totals(visits, bounces, pageviews)",
+    "output": "SELECT DATE_TRUNC('week', s.date) as week, ts.source, COUNT(s.visitId) as total_sessions, SUM(CASE WHEN t.bounces = 1 THEN 1 ELSE 0 END) as bounced_sessions, (SUM(CASE WHEN t.bounces = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(s.visitId)) as bounce_rate FROM ga_sessions s JOIN trafficSource ts ON s.visitId = ts.visitId JOIN totals t ON s.visitId = t.visitId WHERE s.date >= DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '3 months' GROUP BY DATE_TRUNC('week', s.date), ts.source ORDER BY week, bounce_rate DESC;"
+  },
+  {
+    "instruction": "Find products that have been viewed but never purchased.",
+    "input": "Database has tables: products(id, name, category_id), page_views(id, product_id, user_id, view_date), order_items(order_id, product_id, quantity)",
+    "output": "SELECT p.id, p.name FROM products p WHERE EXISTS (SELECT 1 FROM page_views pv WHERE pv.product_id = p.id) AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.id);"
+  },
+  {
+    "instruction": "Calculate the retention rate of users who made a purchase in January 2022 and returned to make another purchase in February 2022.",
+    "input": "Database has tables: users(id, name, email, registration_date), orders(id, user_id, order_date, total_amount)",
+    "output": "WITH jan_purchasers AS (SELECT DISTINCT user_id FROM orders WHERE order_date BETWEEN '2022-01-01' AND '2022-01-31'), feb_purchasers AS (SELECT DISTINCT user_id FROM orders WHERE order_date BETWEEN '2022-02-01' AND '2022-02-28') SELECT COUNT(DISTINCT feb_purchasers.user_id) * 100.0 / COUNT(DISTINCT jan_purchasers.user_id) as retention_rate FROM jan_purchasers LEFT JOIN feb_purchasers ON jan_purchasers.user_id = feb_purchasers.user_id;"
   },
   {
     "instruction": "List all books published after 2020 with their authors.",
@@ -98,5 +143,65 @@
     "instruction": "Find customers who have purchased all products in a specific category.",
     "input": "Database has tables: customers(id, name), products(id, name, category_id), orders(id, customer_id), order_items(order_id, product_id)",
     "output": "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT p.id FROM products p WHERE p.category_id = 3 AND NOT EXISTS (SELECT oi.order_id FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE o.customer_id = c.id AND oi.product_id = p.id));"
+  },
+  {
+    "instruction": "Analyze the conversion funnel by calculating the percentage of users who progress from page view to add-to-cart to purchase.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, date), hits(hitNumber, visitId, eventInfo_eventCategory, eventInfo_eventAction, page_pagePath), eCommerceAction(action_type)",
+    "output": "WITH page_viewers AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId WHERE h.page_pagePath LIKE '/product/%'), cart_adders AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId WHERE h.eventInfo_eventCategory = 'ecommerce' AND h.eventInfo_eventAction = 'add_to_cart'), purchasers AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId JOIN eCommerceAction e ON h.hitNumber = e.hitNumber WHERE e.action_type = '6') SELECT page_viewers.count as page_viewers, cart_adders.count as cart_adders, purchasers.count as purchasers, (cart_adders.count * 100.0 / page_viewers.count) as view_to_cart_rate, (purchasers.count * 100.0 / cart_adders.count) as cart_to_purchase_rate, (purchasers.count * 100.0 / page_viewers.count) as view_to_purchase_rate FROM page_viewers, cart_adders, purchasers;"
+  },
+  {
+    "instruction": "Find the most common browser and operating system combinations for mobile users.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, date), device(deviceCategory, browser, operatingSystem, isMobile)",
+    "output": "SELECT d.browser, d.operatingSystem, COUNT(*) as session_count FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'mobile' GROUP BY d.browser, d.operatingSystem ORDER BY session_count DESC LIMIT 10;"
+  },
+  {
+    "instruction": "Compute the average order value by traffic source for customers who have made at least 3 purchases.",
+    "input": "Database has tables: ga_sessions(fullVisitorId, visitId), trafficSource(source, medium, campaign), transactions(transactionId, visitId, totalTransactionRevenue)",
+    "output": "WITH customer_purchase_counts AS (SELECT s.fullVisitorId, COUNT(DISTINCT t.transactionId) as purchase_count FROM ga_sessions s JOIN transactions t ON s.visitId = t.visitId GROUP BY s.fullVisitorId HAVING COUNT(DISTINCT t.transactionId) >= 3) SELECT ts.source, AVG(t.totalTransactionRevenue / 1000000) as avg_order_value FROM ga_sessions s JOIN trafficSource ts ON s.visitId = ts.visitId JOIN transactions t ON s.visitId = t.visitId JOIN customer_purchase_counts cpc ON s.fullVisitorId = cpc.fullVisitorId GROUP BY ts.source ORDER BY avg_order_value DESC;"
+  },
+  {
+    "instruction": "Identify seasonal trends in product sales by comparing quarterly revenue for each product category over the past two years.",
+    "input": "Database has tables: orders(id, order_date, total_amount), order_items(order_id, product_id, quantity, item_price), products(id, name, category_id), categories(id, name)",
+    "output": "WITH quarterly_sales AS (SELECT c.name as category, EXTRACT(YEAR FROM o.order_date) as year, EXTRACT(QUARTER FROM o.order_date) as quarter, SUM(oi.quantity * oi.item_price) as quarterly_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 years' GROUP BY c.name, EXTRACT(YEAR FROM o.order_date), EXTRACT(QUARTER FROM o.order_date)) SELECT qs1.category, qs1.quarter, qs1.quarterly_revenue as current_year_revenue, qs2.quarterly_revenue as previous_year_revenue, ((qs1.quarterly_revenue - qs2.quarterly_revenue) / qs2.quarterly_revenue) * 100 as yoy_growth_percentage FROM quarterly_sales qs1 JOIN quarterly_sales qs2 ON qs1.category = qs2.category AND qs1.quarter = qs2.quarter AND qs1.year = qs2.year + 1 ORDER BY qs1.category, qs1.quarter;"
+  },
+  {
+    "instruction": "Find all chess games where a player achieved checkmate in less than 20 moves.",
+    "input": "Database has tables: chess_games(id, white_player_id, black_player_id, date, result, moves, ply_count), players(id, name, country, elo_rating)",
+    "output": "SELECT g.id, wp.name as white_player, bp.name as black_player, g.moves, g.ply_count FROM chess_games g JOIN players wp ON g.white_player_id = wp.id JOIN players bp ON g.black_player_id = bp.id WHERE (g.result = '1-0' OR g.result = '0-1') AND g.ply_count < 40 AND g.moves LIKE '%#' ORDER BY g.ply_count ASC;"
+  },
+  {
+    "instruction": "For each patient, find their most commonly prescribed medication and the total cost of all their prescriptions.",
+    "input": "Database has tables: patients(id, name, dob, gender), prescriptions(id, patient_id, medication_id, dosage, date_prescribed, refills), medications(id, name, category, cost_per_unit)",
+    "output": "WITH med_counts AS (SELECT p.id as patient_id, m.id as medication_id, m.name as medication_name, COUNT(*) as prescription_count, ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY COUNT(*) DESC) as rank FROM patients p JOIN prescriptions pr ON p.id = pr.patient_id JOIN medications m ON pr.medication_id = m.id GROUP BY p.id, m.id, m.name) SELECT p.name as patient_name, mc.medication_name as most_common_medication, mc.prescription_count, SUM(m.cost_per_unit * pr.dosage * (pr.refills + 1)) as total_medication_cost FROM patients p JOIN med_counts mc ON p.id = mc.patient_id AND mc.rank = 1 JOIN prescriptions pr ON p.id = pr.patient_id JOIN medications m ON pr.medication_id = m.id GROUP BY p.name, mc.medication_name, mc.prescription_count ORDER BY total_medication_cost DESC;"
+  },
+  {
+    "instruction": "Calculate the win-loss record for each NBA team during the 2021-2022 season, including home and away performance.",
+    "input": "Database has tables: games(id, home_team_id, away_team_id, home_score, away_score, date, season), teams(id, name, city, conference)",
+    "output": "WITH team_games AS (SELECT t.id, t.name, g.id as game_id, CASE WHEN g.home_team_id = t.id THEN 'home' ELSE 'away' END as location, CASE WHEN (g.home_team_id = t.id AND g.home_score > g.away_score) OR (g.away_team_id = t.id AND g.away_score > g.home_score) THEN 1 ELSE 0 END as is_win FROM teams t JOIN games g ON t.id = g.home_team_id OR t.id = g.away_team_id WHERE g.season = '2021-2022') SELECT tg.name as team_name, COUNT(*) as games_played, SUM(tg.is_win) as wins, COUNT(*) - SUM(tg.is_win) as losses, ROUND(SUM(tg.is_win) * 100.0 / COUNT(*), 1) as win_percentage, SUM(CASE WHEN tg.location = 'home' THEN tg.is_win ELSE 0 END) as home_wins, SUM(CASE WHEN tg.location = 'home' THEN 1 - tg.is_win ELSE 0 END) as home_losses, SUM(CASE WHEN tg.location = 'away' THEN tg.is_win ELSE 0 END) as away_wins, SUM(CASE WHEN tg.location = 'away' THEN 1 - tg.is_win ELSE 0 END) as away_losses FROM team_games tg GROUP BY tg.id, tg.name ORDER BY win_percentage DESC;"
+  },
+  {
+    "instruction": "Identify anomalous login activity by finding users who have logged in from more than 3 different countries within a 24-hour period.",
+    "input": "Database has tables: users(id, username, email), login_events(id, user_id, timestamp, ip_address, country, city, device_type, success)",
+    "output": "WITH daily_login_locations AS (SELECT user_id, DATE(timestamp) as login_date, COUNT(DISTINCT country) as country_count FROM login_events WHERE success = true GROUP BY user_id, DATE(timestamp) HAVING COUNT(DISTINCT country) > 3) SELECT u.username, dll.login_date, dll.country_count, STRING_AGG(DISTINCT le.country, ', ') as countries FROM daily_login_locations dll JOIN users u ON dll.user_id = u.id JOIN login_events le ON dll.user_id = le.user_id AND DATE(le.timestamp) = dll.login_date WHERE le.success = true GROUP BY u.username, dll.login_date, dll.country_count ORDER BY dll.login_date DESC, dll.country_count DESC;"
+  },
+  {
+    "instruction": "Find the top 5 universities with the highest percentage of international students.",
+    "input": "Database has tables: universities(id, name, location, founded_year, type), students(id, university_id, name, nationality, enrollment_year, major_id), majors(id, name, department)",
+    "output": "WITH student_counts AS (SELECT u.id, u.name, COUNT(*) as total_students, SUM(CASE WHEN s.nationality != SUBSTRING(u.location, POSITION(',' IN u.location) + 1) THEN 1 ELSE 0 END) as international_students FROM universities u JOIN students s ON u.id = s.university_id GROUP BY u.id, u.name) SELECT name, total_students, international_students, ROUND((international_students * 100.0 / total_students), 2) as international_percentage FROM student_counts ORDER BY international_percentage DESC LIMIT 5;"
+  },
+  {
+    "instruction": "Analyze the effect of weather conditions on restaurant sales by comparing average daily revenue on rainy days versus sunny days.",
+    "input": "Database has tables: restaurants(id, name, cuisine, location), sales(id, restaurant_id, date, total_revenue, customer_count), weather(date, location, condition, temperature, precipitation)",
+    "output": "WITH daily_sales AS (SELECT r.id, r.name, s.date, w.condition, s.total_revenue FROM restaurants r JOIN sales s ON r.id = s.restaurant_id JOIN weather w ON s.date = w.date AND r.location = w.location) SELECT name, AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) as avg_revenue_rainy_days, AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END) as avg_revenue_sunny_days, (AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) - AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END)) as revenue_difference, ((AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) - AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END)) / AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END) * 100) as percentage_difference FROM daily_sales GROUP BY id, name ORDER BY percentage_difference;"
+  },
+  {
+    "instruction": "Create a report showing the monthly active users (MAU) and daily active users (DAU) ratio for a mobile app over the past year.",
+    "input": "Database has tables: users(id, username, registration_date), app_sessions(id, user_id, session_start, session_end, device_type)",
+    "output": "WITH daily_users AS (SELECT DATE(session_start) as activity_date, COUNT(DISTINCT user_id) as dau FROM app_sessions WHERE session_start >= CURRENT_DATE - INTERVAL '1 year' GROUP BY DATE(session_start)), monthly_users AS (SELECT DATE_TRUNC('month', session_start) as month, COUNT(DISTINCT user_id) as mau FROM app_sessions WHERE session_start >= CURRENT_DATE - INTERVAL '1 year' GROUP BY DATE_TRUNC('month', session_start)) SELECT TO_CHAR(m.month, 'YYYY-MM') as month, m.mau, ROUND(AVG(d.dau), 2) as avg_dau, ROUND(AVG(d.dau) * 100.0 / m.mau, 2) as dau_mau_ratio FROM monthly_users m JOIN daily_users d ON d.activity_date BETWEEN m.month AND (m.month + INTERVAL '1 month' - INTERVAL '1 day') GROUP BY m.month, m.mau ORDER BY m.month;"
+  },
+  {
+    "instruction": "Generate a query that calculates the lifetime value (LTV) of customers segmented by their acquisition channel.",
+    "input": "Database has tables: customers(id, name, email, acquisition_channel, acquisition_date), orders(id, customer_id, order_date, total_amount, status)",
+    "output": "WITH customer_value AS (SELECT c.id, c.acquisition_channel, SUM(CASE WHEN o.status != 'cancelled' THEN o.total_amount ELSE 0 END) as lifetime_value, DATEDIFF(MAX(o.order_date), MIN(o.order_date)) / 365.0 as customer_lifespan_years FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.acquisition_channel HAVING COUNT(o.id) > 0) SELECT acquisition_channel, COUNT(*) as customer_count, ROUND(AVG(lifetime_value), 2) as avg_lifetime_value, ROUND(MAX(lifetime_value), 2) as max_lifetime_value, ROUND(MIN(lifetime_value), 2) as min_lifetime_value, ROUND(AVG(customer_lifespan_years), 2) as avg_customer_lifespan, ROUND(AVG(lifetime_value) / AVG(customer_lifespan_years), 2) as avg_annual_value FROM customer_value GROUP BY acquisition_channel ORDER BY avg_lifetime_value DESC;"
   }
 ]

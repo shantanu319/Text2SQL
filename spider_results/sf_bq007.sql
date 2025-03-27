@@ -1,31 +1,28 @@
-SELECT state_name, SUM(weighted_employment) AS total_weighted_employment FROM (
-    SELECT state_name, SUM(employment_sector * weight) AS weighted_employment
-    FROM (
-        SELECT state_name, sector, SUM(value) AS employment_sector
-        FROM (
-            SELECT state_name, 'Employment in Agriculture' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19013'
-            UNION ALL
-            SELECT state_name, 'Employment in Manufacturing' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19014'
-            UNION ALL
-            SELECT state_name, 'Employment in Construction' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19015'
-            UNION ALL
-            SELECT state_name, 'Employment in Transportation and Warehousing' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19016'
-            UNION ALL
-            SELECT state_name, 'Employment in Information' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19017'
-            UNION ALL
-            SELECT state_name, 'Employment in Finance and Insurance' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19018'
-            UNION ALL
-            SELECT state_name, 'Employment in Real Estate and Rental and Leasing' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19019'
-            UNION ALL
-            SELECT state_name, 'Employment in Professional, Scientific, and Technical Services' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B19020'
-            UNION ALL
-            SELECT state_name, 'Employment in Management, Business, and Financial Operations' AS sector, value
-            FROM acs_data_2017 WHERE year = 2017 AND variable = 'B190
+```sql
+SELECT 
+    state_name,
+    SUM(weighted_sum) AS total_vulnerable_population,
+    AVG(median_income_change) AS average_median_income_change
+FROM (
+    SELECT 
+        state_name,
+        SUM(employment_sector_weight * employment_sector_value) AS weighted_sum,
+        z.zip_code,
+        (z.median_income_2018 - z.median_income_2015) / 3 AS median_income_change
+    FROM 
+        us_states s
+    JOIN 
+        employment_sectors es ON s.state_id = es.state_id
+    JOIN 
+        zip_codes z ON s.state_id = z.state_id
+    GROUP BY 
+        state_name, z.zip_code
+) AS subquery
+GROUP BY 
+    state_name
+ORDER BY 
+    total_vulnerable_population DESC
+LIMIT 10;
+```
+
+This SQL query calculates the top 10 U.S. states with the highest vulnerable population based on a weighted sum of employment sectors using 2017 ACS 5-Year data. It also determines their average median income change from 2015 to 2018 using zip code data. The results are ordered by the total vulnerable population in descending order and limited to the top 10

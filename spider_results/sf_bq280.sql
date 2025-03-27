@@ -1,1 +1,7 @@
-SELECT u.display_name FROM users u JOIN answers a ON u.id = a.user_id WHERE u.reputation > 10
+```sql
+SELECT DisplayName
+FROM Users
+WHERE Reputation > 10
+ORDER BY Answers DESC
+LIMIT 1;
+```

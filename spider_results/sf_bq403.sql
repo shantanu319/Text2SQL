@@ -1,1 +1,12 @@
-SELECT year, ABS(median_revenue - median_expenses) AS diff FROM (
+```sql
+SELECT 
+    YEAR,
+    ABS(MEDIAN_REVENUE - MEDIAN_FUNCTIONAL_EXPENSES) AS DIFFERENCE
+FROM 
+    organization_990
+WHERE 
+    YEAR BETWEEN 2012 AND 2017
+ORDER BY 
+    DIFFERENCE ASC
+LIMIT 3;
+```

@@ -1,1 +1,1 @@
-SELECT bowler, MIN(avg_wkts) as min_avg_wkts FROM bowling_stats
+SELECT bowler FROM bowling_stats ORDER BY avg_per_wicket ASC LIMIT 1;

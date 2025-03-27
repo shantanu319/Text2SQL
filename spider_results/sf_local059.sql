@@ -1,1 +1,18 @@
-SELECT d.name AS Division, p.name AS Product, AVG(s.quantity_sold) AS Average_Sales FROM sales s JOIN product p ON s.product_id = p.id JOIN division d ON s.division_id = d.id WHERE YEAR(s.date) = 2021 GROUP BY d.name, p.name ORDER BY
+```sql
+SELECT 
+    d.division_name,
+    AVG(h.quantity_sold) AS avg_quantity_sold
+FROM 
+    divisions d
+JOIN 
+    sales s ON d.division_id = s.division_id
+JOIN 
+    hardware h ON s.hardware_id = h.hardware_id
+WHERE 
+    YEAR(s.sale_date) = 2021
+GROUP BY 
+    d.division_name
+ORDER BY 
+    SUM(h.quantity_sold) DESC
+LIMIT 3;
+```

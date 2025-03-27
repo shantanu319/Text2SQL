@@ -1,6 +1,22 @@
-SELECT borough, AVG(mean_income) AS avg_mean_income FROM (
-  SELECT t.borough, i.mean_income
-  FROM trees_data t
-  JOIN income_data i ON t.zip = i.zip
-  WHERE t.median_income > 0 AND i.mean_income > 0 AND t.borough IS NOT NULL
-)
+```sql
+SELECT 
+    Borough,
+    AVG(MeanIncome) AS AverageMeanIncome
+FROM (
+    SELECT 
+        T1.Borough,
+        T2.MedianIncome,
+        T2.MeanIncome
+    FROM 
+        TreesData AS T1
+    LEFT JOIN 
+        IncomeData AS T2 ON T1.ZIPCode = T2.ZIPCode
+    WHERE 
+        T2.MedianIncome > 0 AND T2.MeanIncome > 0 AND T1.Borough IS NOT NULL
+) AS SubQuery
+GROUP BY 
+    Borough
+ORDER BY 
+    COUNT(*) DESC
+LIMIT 3;
+```

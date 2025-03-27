@@ -1,1 +1,1 @@
-SELECT latitude FROM hurricanes WHERE name = 'Hurricane' AND year = 2020
+SELECT T1.latitude FROM hurricanes AS T1 INNER JOIN paths AS T2 ON T1.id = T2.hurricane_id WHERE T2.distance = ( SELECT MAX(distance) FROM paths WHERE hurricane_id IN ( SELECT id FROM hurricanes WHERE year = 2020 ORDER BY distance DESC LIMIT 1 ) ) ORDER BY T2.distance DESC LIMIT 1;

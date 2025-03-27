@@ -1,1 +1,7 @@
-SELECT name FROM baby_names WHERE state = 'Wyoming' AND year = 2021 ORDER BY (COUNT(*) / (SELECT COUNT(*) FROM baby_names WHERE state = 'Wyoming' AND year = 2021)) DESC LIMIT 1
+```sql
+SELECT Name
+FROM BabyNames
+WHERE State = 'Wyoming' AND Year = 2021
+ORDER BY Proportion DESC
+LIMIT 1;
+```

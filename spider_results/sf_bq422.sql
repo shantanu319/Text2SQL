@@ -1,20 +1,45 @@
-SELECT AVG(series_size_in_MiB)
+```sql
+SELECT 
+    patient_id,
+    AVG(series_size / 1024 / 1024) AS avg_series_size_mib
 FROM (
-    SELECT patient_id, SUM(instance_size_in_MiB) AS series_size_in_MiB
+    SELECT 
+        patient_id,
+        SUM(instance_size) / 1024 / 1024 AS series_size,
+        MAX(slice_interval_difference_tolerance) AS max_slice_interval_diff_tol,
+        MAX(max_exposure_difference) AS max_max_exposure_diff
     FROM (
-        SELECT patient_id, image_id, MAX(slice_interval_difference_tolerance) AS max_slice_interval_difference_tolerance,
-               MIN(slice_interval_difference_tolerance) AS min_slice_interval_difference_tolerance,
-               MAX(exposure_difference) AS max_exposure_difference,
-               MIN(exposure_difference) AS min_exposure_difference
+        SELECT 
+            patient_id,
+            study_instance_uid,
+            instance_size,
+            slice_interval_difference_tolerance,
+            max_exposure_difference
+        FROM 
+            nlst_images
+        WHERE 
+            modality = 'CT'
+    ) AS subquery
+    GROUP BY 
+        patient_id
+) AS subquery_2
+WHERE 
+    max_slice_interval_diff_tol IN (
+        SELECT 
+            max_slice_interval_diff_tol
         FROM (
-            SELECT p.patient_id, i.image_id, s.slice_interval_difference_tolerance, e.exposure_difference
-            FROM nlst.pacs_images i
-            JOIN nlst.pacs_patients p ON i.patient_id = p.patient_id
-            JOIN nlst.pacs_series s ON i.series_id = s.series_id
-            JOIN nlst.pacs_exposures e ON i.exposure_id = e.exposure_id
-            WHERE s.collection_name = 'nlst'
-        ) subquery
-        GROUP BY patient_id
-    ) subquery2
-    ORDER BY max_slice_interval_difference_tolerance DESC, max_exposure_difference DESC
-    LIMIT 3
+            SELECT 
+                patient_id,
+                MAX(slice_interval_difference_tolerance) AS max_slice_interval_diff_tol
+            FROM (
+                SELECT 
+                    patient_id,
+                    study_instance_uid,
+                    instance_size,
+                    slice_interval_difference_tolerance,
+                    max_exposure_difference
+                FROM 
+                    nlst_images
+                WHERE 
+                    modality = 'CT'
+            )

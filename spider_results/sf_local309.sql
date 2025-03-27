@@ -1,1 +1,15 @@
-SELECT d.full_name AS Driver_Name, c.name AS Constructor_Name, y.year, SUM(p.points) AS Total_Points
+```sql
+SELECT 
+    YEAR,
+    DriverFullName,
+    ConstructorName,
+    MAX(Points) AS MaxPoints
+FROM 
+    races
+JOIN 
+    drivers ON races.DriverID = drivers.DriverID
+JOIN 
+    constructors ON races.ConstructorID = constructors.ConstructorID
+GROUP BY 
+    YEAR, DriverFullName, ConstructorName;
+```

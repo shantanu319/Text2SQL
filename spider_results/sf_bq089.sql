@@ -1,1 +1,8 @@
-SELECT COUNT(*) / (COUNT(*) * 1000) AS vaccine_sites_per_1000_people
+```sql
+SELECT 
+    COUNT(*) / (SUM(CAST(TotalPop AS REAL)) / 1000) * 1000 AS VaccineSitesPer1000People
+FROM 
+    Counties
+WHERE 
+    State = 'California';
+```

@@ -1,1 +1,14 @@
-SELECT AVG(temperature), AVG(wind_speed), AVG(precipitation) FROM weather_data WHERE airport = 'LaGuardia Airport' AND city = 'New York City' AND month = 6 AND day = 12 AND year BETWEEN 2011 AND 2020 AND station_id = 725030
+```sql
+SELECT 
+    YEAR(date) AS Year,
+    AVG(temperature) AS AverageTemperature,
+    AVG(wind_speed) AS AverageWindSpeed,
+    SUM(precipitation) AS TotalPrecipitation
+FROM 
+    weather_data
+WHERE 
+    station_id = 725030 AND 
+    date BETWEEN '2011-06-12' AND '2020-06-12'
+GROUP BY 
+    YEAR(date);
+```

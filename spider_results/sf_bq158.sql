@@ -1,1 +1,8 @@
-SELECT TOP 5 HistologyType, COUNT(*) AS MutationCount FROM BRCA WHERE CDH1Mutation = 'Yes' GROUP BY HistologyType ORDER BY MutationCount DESC
+```sql
+SELECT histological_type, COUNT(*) AS mutation_count
+FROM pan_can_atlas
+WHERE gene = 'CDH1'
+GROUP BY histological_type
+ORDER BY mutation_count DESC
+LIMIT 5;
+```

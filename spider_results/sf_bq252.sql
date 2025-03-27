@@ -1,1 +1,9 @@
-SELECT r.name FROM repositories r JOIN files f ON r.id = f.repository_id WHERE f.language = 'Swift' AND f.is_binary = 0 GROUP BY f.file_id ORDER BY COUNT(*) DESC LIMIT 1
+```sql
+SELECT r.name AS repository_name
+FROM repositories r
+JOIN files f ON r.id = f.repository_id
+WHERE f.type != 'binary'
+GROUP BY r.id, r.name
+ORDER BY COUNT(DISTINCT f.id) DESC
+LIMIT 1;
+```

@@ -1,1 +1,5 @@
-SELECT ROUND(AVG(speed), 1) FROM trips WHERE city = 'Berkeley' AND distance > 1000
+```sql
+SELECT ROUND(AVG(speed), 1) AS avg_speed
+FROM trips
+WHERE city = 'Berkeley' AND distance > 1000;
+```

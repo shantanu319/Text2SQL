@@ -1,1 +1,1 @@
-SELECT COUNT(*) FROM trees WHERE borough = 'Bronx' AND health_status = 'Good';
+SELECT CAST(SUM(CASE WHEN Health_Status = 'Good' THEN 1 ELSE 0 END) AS REAL) * 100 / COUNT(*) FROM Trees WHERE Borough = 'Bronx';
