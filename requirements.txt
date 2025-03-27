@@ -3,7 +3,7 @@ numpy==1.24.0
 tqdm>=4.65.0
 transformers>=4.30.0
 accelerate>=0.20.0
-bitsandbytes>=0.39.0
+bitsandbytes>=0.41.0
 sentencepiece>=0.1.99
 deepspeed>=0.9.0 
 optimum>=1.8.0
@@ -16,3 +16,8 @@ datasets>=2.14.0
 torchvision==0.20.0
 torchaudio==2.5.0
 tf-keras>=2.12.0
+pyarrow<19.0.0
+# Added for Spider2-snow evaluation
+duckdb>=1.2.0
+snowflake-connector-python>=3.14.0
+google-cloud-bigquery>=3.0.0

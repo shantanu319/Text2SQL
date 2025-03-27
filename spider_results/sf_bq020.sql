@@ -1,1 +1,6 @@
-SELECT name FROM reference_sequences WHERE variant_density = (SELECT MAX(variant_density) FROM cannabis_genome_dataset);
+```sql
+SELECT ReferenceSequenceName
+FROM CannabisGenomeDataset
+ORDER BY VariantDensity DESC
+LIMIT 1;
+```

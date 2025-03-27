@@ -1,1 +1,10 @@
-SELECT AVG(duration) FROM yellow_taxi_trips WHERE pickup_datetime BETWEEN '2016-02-01' AND '2016-02-07' AND dropoff_datetime BETWEEN '2016-02-01' AND '2016-02-07' AND passenger_count > 3 AND trip_distance >= 10 AND pickup_location IN ('Brooklyn')
+```sql
+SELECT AVG(TripDuration) AS AverageTripDurationInMinutes
+FROM Trips
+WHERE TripDate BETWEEN '2016-02-01' AND '2016-02-07'
+  AND TripDuration > 0
+  AND NumberOfPassengers > 3
+  AND TripDistance >= 10
+  AND PickupLocation LIKE '%Brooklyn%'
+  AND DropoffLocation LIKE '%Brooklyn%';
+```

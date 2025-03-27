@@ -1,1 +1,11 @@
-SELECT COUNT(*) FROM commits WHERE language = 'Shell' AND license = 'apache-2.0' AND LENGTH(message) > 5 AND LENGTH(message) < 10000 AND NOT (message LIKE '% merge%' OR message LIKE '% update%' OR message LIKE '% test%');
+```sql
+SELECT COUNT(*) AS commit_count
+FROM commits
+JOIN repositories ON commits.repository_id = repositories.id
+WHERE repositories.language = 'Shell'
+  AND repositories.license = 'apache-2.0'
+  AND LENGTH(commits.message) BETWEEN 6 AND 9999
+  AND commits.message NOT LIKE '%merge%'
+  AND commits.message NOT LIKE '%update%'
+  AND commits.message NOT LIKE '%test%';
+```

@@ -1,1 +1,8 @@
-SELECT country, SUM(amount) as total_amount FROM debt_data WHERE region IS NOT NULL GROUP BY country ORDER BY total_amount DESC LIMIT 10
+```sql
+SELECT country_name, SUM(long_term_external_debt) AS total_debt
+FROM countries
+WHERE region IS NOT NULL
+GROUP BY country_name
+ORDER BY total_debt DESC
+LIMIT 10;
+```

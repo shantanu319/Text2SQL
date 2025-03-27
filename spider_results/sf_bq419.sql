@@ -1,1 +1,16 @@
-SELECT state_abbr, COUNT(*) as num_events FROM storm_events WHERE YEAR >= 1980 AND YEAR <= 1995 GROUP BY state_abbr ORDER BY num_events DESC LIMIT 5
+```sql
+SELECT 
+    T2.state_abbr,
+    COUNT(*) AS event_count
+FROM 
+    storm_events AS T1
+JOIN 
+    states AS T2 ON T1.state = T2.state_name
+WHERE 
+    T1.event_year BETWEEN 1980 AND 1995
+GROUP BY 
+    T2.state_abbr
+ORDER BY 
+    event_count DESC
+LIMIT 5;
+```

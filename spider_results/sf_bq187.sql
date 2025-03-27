@@ -1,5 +1,14 @@
-SELECT SUM(balance / POWER(10, 18)) AS total_circulating_supply FROM (
-    SELECT sender_address AS address, SUM(amount_received - amount_sent) AS balance
-    FROM transactions
-    WHERE sender_address != '0x000...' AND receiver_address != '0x000...'
-    GROUP BY sender_address
+```sql
+SELECT SUM(balance / POWER(10, 18)) AS total_circulating_supply
+FROM (
+    SELECT 
+        sender,
+        receiver,
+        amount_received - amount_sent AS balance
+    FROM 
+        transactions
+    WHERE 
+        sender != '0x000...' AND 
+        receiver != '0x000...'
+) AS filtered_transactions;
+```

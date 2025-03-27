@@ -1,1 +1,20 @@
-SELECT p.name, COUNT(*) AS num_points FROM multipolygon m JOIN point p ON ST_Contains(m.geometry, p.geometry) WHERE m.wikidata IS NULL GROUP BY p.name ORDER BY num_points DESC LIMIT 2
+```sql
+SELECT 
+    name,
+    COUNT(*) AS point_count
+FROM 
+    multipolygons
+WHERE 
+    geog_area = (SELECT geog_area FROM multipolygons WHERE wikidata_id = 'Q191')
+    AND NOT EXISTS (
+        SELECT 1
+        FROM tags
+        WHERE multipolygon_id = multipolygons.id
+        AND tag_name = 'wikidata'
+    )
+GROUP BY 
+    name
+ORDER BY 
+    point_count DESC
+LIMIT 2;
+```

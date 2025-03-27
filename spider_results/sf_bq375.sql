@@ -1,11 +1,14 @@
-SELECT file_type, COUNT(*) as file_count FROM (
-    SELECT 'Python' AS file_type, COUNT(*) FROM github_codebase WHERE file_extension = '.py'
-    UNION ALL
-    SELECT 'C' AS file_type, COUNT(*) FROM github_codebase WHERE file_extension = '.c'
-    UNION ALL
-    SELECT 'Jupyter Notebook' AS file_type, COUNT(*) FROM github_codebase WHERE file_extension = '.ipynb'
-    UNION ALL
-    SELECT 'Java' AS file_type, COUNT(*) FROM github_codebase WHERE file_extension = '.java'
-    UNION ALL
-    SELECT 'JavaScript' AS file_type, COUNT(*) FROM github_codebase WHERE file_extension = '.js'
-)
+```sql
+SELECT 
+    CASE 
+        WHEN filename LIKE '%.py' THEN 'Python'
+        WHEN filename LIKE '%.c' THEN 'C'
+        WHEN filename LIKE '%.ipynb' THEN 'Jupyter Notebook'
+        WHEN filename LIKE '%.java' THEN 'Java'
+        WHEN filename LIKE '%.js' THEN 'JavaScript'
+    END AS file_type,
+    COUNT(*) AS file_count
+FROM 
+    github_codebase
+WHERE 
+    path LIKE '/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%/%

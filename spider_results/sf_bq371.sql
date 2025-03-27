@@ -1,5 +1,14 @@
-SELECT 
-    AVG(unit_price * quantity) AS avg_invoice_value,
-    QUARTER(invoice_date) AS quarter
-FROM 
-    invoices
+```sql
+SELECT MAX(AVG_Value) - MIN(AVG_Value) AS Difference
+FROM (
+    SELECT 
+        QUARTER(invoice_date) AS Quarter,
+        AVG(unit_price * quantity) AS AVG_Value
+    FROM 
+        invoices
+    WHERE 
+        YEAR(invoice_date) = 2013
+    GROUP BY 
+        Quarter
+) AS Invoice_Quarters;
+```

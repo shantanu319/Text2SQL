@@ -1,1 +1,12 @@
-SELECT object_id, title, DATE_FORMAT(metadata_date, '%Y-%m-%d') AS formatted_metadata_date FROM objects WHERE department = 'The Libraries' AND crop_confidence > 0.5 AND title LIKE '%book%';
+```sql
+SELECT 
+    objectId,
+    title,
+    DATE_FORMAT(metadataDate, '%Y-%m-%d') AS formattedMetadataDate
+FROM 
+    objects
+WHERE 
+    department = 'The Libraries'
+    AND cropConfidence > 0.5
+    AND title LIKE '%book%';
+```

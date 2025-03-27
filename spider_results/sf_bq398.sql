@@ -1,1 +1,6 @@
-SELECT TOP 3 * FROM Debt_Indicators WHERE Country = 'Russia' ORDER BY Value DESC
+```sql
+SELECT DebtIndicator, DebtValue
+FROM RussiaDebtIndicators
+ORDER BY DebtValue DESC
+LIMIT 3;
+```

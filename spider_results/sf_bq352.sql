@@ -1,1 +1,8 @@
-SELECT AVG(prenatal_weeks) FROM counties WHERE county_name = 'Wisconsin' AND (employed_population > 5 AND commute_minutes >= 45 AND commute_minutes <= 59);
+```sql
+SELECT AVG(prenatal_weeks) AS average_prenatal_weeks
+FROM county_data
+WHERE state = 'Wisconsin'
+  AND YEAR(employment_data.year) = 2017
+  AND employment_data.commute_minutes BETWEEN 45 AND 59
+  AND employment_data.percent_employed > 5;
+```

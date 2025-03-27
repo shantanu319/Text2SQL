@@ -1,1 +1,7 @@
-SELECT p.product_name, AVG(pu.units_picked) AS avg_units_picked FROM products p JOIN picking_orders po ON p.id = po.product_id WHERE po.order_number = 421 GROUP BY p.product_name;
+```sql
+SELECT p.product_name, AVG(picked_units) AS average_picked_units
+FROM products p
+JOIN order_items oi ON p.product_id = oi.product_id
+WHERE oi.order_id = 421
+GROUP BY p.product_name;
+```

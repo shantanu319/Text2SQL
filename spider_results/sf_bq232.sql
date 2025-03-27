@@ -1,1 +1,8 @@
-SELECT YEAR(date) AS Year, COUNT(*) AS Total_Thefts FROM incidents WHERE category = 'Theft and Handling' AND subcategory = 'Other Theft';
+```sql
+SELECT YEAR(IncidentDate) AS IncidentYear, COUNT(*) AS TotalOtherThefts
+FROM Incidents
+WHERE Category = 'Theft and Handling'
+  AND SubCategory = 'Other Theft'
+  AND Borough = 'Westminster'
+GROUP BY IncidentYear;
+```
