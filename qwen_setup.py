@@ -360,7 +360,9 @@ def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_resu
     # Set CUDA optimizations
     torch.backends.cudnn.benchmark = True
     
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
+    
     eval_suite_path = os.path.join(spider_dir, "Spider2", "spider2-snow", "evaluation_suite")
     
     if not os.path.exists(eval_suite_path):
@@ -390,10 +392,10 @@ def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_resu
         sql_file_path = os.path.join(output_dir, f"{instance_id}.sql")
         if os.path.exists(sql_file_path):
             print(f"Prediction for {instance_id} already exists, skipping...")
-        continue
+            continue
         generated_sql = generate_sql_from_prompt(model, tokenizer, question)
         with open(sql_file_path, 'w') as f:
-        f.write(generated_sql)
+            f.write(generated_sql)
         print(f"Generated SQL for {instance_id}")
     
     gold_dir = os.path.join(eval_suite_path, "gold")
