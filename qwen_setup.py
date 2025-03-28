@@ -397,14 +397,24 @@ def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_resu
     
     if not os.path.exists(spider_dev_file):
         print(f"Spider dev dataset not found at {spider_dev_file}")
-        # Try alternative path
-        alternative_path = os.path.join(spider_dir, "dev.json")
-        if os.path.exists(alternative_path):
-            spider_dev_file = alternative_path
-            print(f"Found Spider dev dataset at {spider_dev_file}")
-        else:
-            print(f"Spider dev dataset not found at {alternative_path} either")
-        return None
+        # Try alternative paths
+        alternative_paths = [
+            os.path.join(spider_dir, "dev.json"),
+            os.path.join(spider_dir, "spider", "evaluation_examples", "examples", "dev.json"),
+            os.path.join(spider_dir, "evaluation_examples", "examples", "dev.json")
+        ]
+        
+        found = False
+        for path in alternative_paths:
+            if os.path.exists(path):
+                spider_dev_file = path
+                print(f"Found Spider dev dataset at {spider_dev_file}")
+                found = True
+                break
+        
+        if not found:
+            print(f"Spider dev dataset not found in any of the expected locations")
+            return None
     
     # Load examples from Spider dev dataset
     examples = []
@@ -559,13 +569,22 @@ def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_resu
         return results
 
 def main():
+    # Suppress TensorFlow warnings
+    os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"  # Suppress most TensorFlow logging
+    os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"  # Disable oneDNN custom operations
+    
+    # Suppress CUDA/cuDNN warnings by avoiding duplicate registrations
+    # These are harmless warnings but can clutter the output
+    import tensorflow as tf
+    tf.get_logger().setLevel('ERROR')
+    
     action = sys.argv[1] if len(sys.argv) > 1 else "finetune"
     data_file = "combined_sql_templates.json"
     spider_dir = os.path.expanduser("~/txt2sql_461")
     output_dir = "./fine_tuned_model"
-    model_name = "Qwen/Qwen2.5-Coder-3B-Instruct"
+    model_name = "Qwen/Qwen2.5-Coder-7B-Instruct"
     
-    if action == "finetune":
+    if action == "finetune": # uses lora finetuning to speed up bigger models
         tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
@@ -578,7 +597,7 @@ def main():
         elif hasattr(torch.mps, 'empty_cache'):
             torch.mps.empty_cache()
 
-        model, metrics = finetune_model(
+        model, metrics = finetune_model_lora(
             model_name=model_name,
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
@@ -594,34 +613,6 @@ def main():
         )
         print(f"Fine-tuning completed! Loss: {metrics.get('eval_loss', 'N/A'):.2f}")
     
-    if action == "lora":
-        tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
-        
-        train_dataset, eval_dataset = load_spider_dataset(spider_dir, tokenizer)
-        if train_dataset is None or eval_dataset is None:
-            print("Failed to load Spider dataset")
-            return
-        
-        print(f"Training on {len(train_dataset)} Spider examples, evaluating on {len(eval_dataset)} examples")
-        
-        finetune_model_lora(
-            model_name,
-            train_dataset,
-            eval_dataset,
-            output_dir=output_dir,
-            batch_size=1,
-            learning_rate=2e-5,
-            num_train_epochs=3,
-            gradient_accumulation_steps=16,
-            fp16=True,
-            lora_r=16,
-            lora_alpha=32,
-            lora_dropout=0.1
-        )
-        print(f"LoRA fine-tuning completed! Loss: {metrics.get('eval_loss', 'N/A'):.2f}")
-        
     elif action == "evaluate":
         tokenizer = AutoTokenizer.from_pretrained(output_dir)
         if tokenizer.pad_token is None:
