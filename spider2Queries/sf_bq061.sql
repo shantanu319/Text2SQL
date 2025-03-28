@@ -1,0 +1,1 @@
+SELECT T3.tract_code FROM census_tract AS T1 INNER JOIN census_data AS T2 ON T1.tract_id = T2.tract_id WHERE T2.year IN (2015, 2016, 2017, 2018) AND T2.median_income > 0 ORDER BY T2.median_income - T1.median_income DESC LIMIT 1;

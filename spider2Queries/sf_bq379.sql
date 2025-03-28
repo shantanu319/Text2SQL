@@ -1,0 +1,1 @@
+SELECT T1.approved_symbol FROM targets AS T1 INNER JOIN associations AS T2 ON T1.target_id = T2.target_id WHERE T2.condition = 'psoriasis' GROUP BY T1.approved_symbol ORDER BY AVG(T2.score) DESC LIMIT 1;

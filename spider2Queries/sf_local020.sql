@@ -1,0 +1,1 @@
+SELECT bowler FROM bowling_stats ORDER BY avg_per_wicket ASC LIMIT 1;

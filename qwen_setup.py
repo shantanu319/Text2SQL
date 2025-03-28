@@ -15,6 +15,7 @@ from sklearn.model_selection import train_test_split
 import subprocess
 import torch.backends.cudnn as cudnn
 
+# needed for tokenization
 def tokenize_function(examples, tokenizer, max_length=512):
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -52,6 +53,7 @@ def tokenize_function(examples, tokenizer, max_length=512):
     
     return tokenized
 
+# splits up and tokenizes query templates
 def prepare_sql_dataset(file_path, tokenizer, test_size=0.1, max_length=512):
     with open(file_path, 'r') as f:
         templates = json.load(f)
@@ -133,6 +135,7 @@ def load_spider_dataset(spider_dir, tokenizer, max_length=512, test_size=0.4):
     
     return tokenized_train, tokenized_val
 
+# finetunes model using LoRA
 def finetune_model_lora(
     model_name, 
     train_dataset, 
@@ -236,6 +239,7 @@ def finetune_model_lora(
     
     return model, eval_metrics
 
+# finetunes model using normal training
 def finetune_model(model_name, train_dataset, eval_dataset, output_dir="./fine_tuned_model", 
                    batch_size=1, learning_rate=2e-5, num_train_epochs=3, 
                    gradient_accumulation_steps=16, fp16=True):
@@ -383,122 +387,180 @@ def compare_results(result1, result2):
     return set(tuple(row) for row in result1) == set(tuple(row) for row in result2)
 
 def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_results", batch_size=4):
+    """
+    Process the Spider dataset and generate SQL predictions in the format expected by the
+    original Spider evaluation script (evaluation.py).
+    """
     # Set CUDA optimizations
     torch.backends.cudnn.benchmark = True
     
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
-    eval_suite_path = os.path.join(spider_dir, "Spider2", "spider2-snow", "evaluation_suite")
     
-    if not os.path.exists(eval_suite_path):
-        print(f"Spider2-snow evaluation suite not found at {eval_suite_path}")
-        eval_suite_path = "/home/ubuntu/ShantanuK/txt2sql_461/Spider2/spider2-snow/evaluation_suite"
-        if not os.path.exists(eval_suite_path):
-            print(f"Spider2-snow evaluation suite not found at {eval_suite_path} either")
-            return None
+    # Path to the original Spider dataset files
+    spider_dev_file = os.path.join(spider_dir, "spider", "dev.json")
+    
+    if not os.path.exists(spider_dev_file):
+        print(f"Spider dev dataset not found at {spider_dev_file}")
+        # Try alternative path
+        alternative_path = os.path.join(spider_dir, "dev.json")
+        if os.path.exists(alternative_path):
+            spider_dev_file = alternative_path
+            print(f"Found Spider dev dataset at {spider_dev_file}")
         else:
-            print(f"Found evaluation suite at {eval_suite_path}")
-
-    spider_snow_file = os.path.join(os.path.dirname(eval_suite_path), "spider2-snow.jsonl")
-    if not os.path.exists(spider_snow_file):
-        print(f"Spider2-snow dataset file not found at {spider_snow_file}")
+            print(f"Spider dev dataset not found at {alternative_path} either")
         return None
-
+    
+    # Load examples from Spider dev dataset
     examples = []
-    with open(spider_snow_file, 'r') as f:
-        for line in f:
-            examples.append(json.loads(line.strip()))
+    try:
+        with open(spider_dev_file, 'r') as f:
+            examples = json.load(f)
+        print(f"Loaded {len(examples)} examples from Spider dev dataset")
+    except Exception as e:
+        print(f"Error loading Spider dev dataset: {e}")
+        return None
     
-    print(f"Loaded {len(examples)} examples from Spider2-snow dataset")
+    # Create output files
+    pred_file_path = os.path.join(output_dir, "pred_spider.sql")
+    gold_file_path = os.path.join(output_dir, "gold_spider.sql")
     
-    for example in examples:
-        instance_id = example["instance_id"]
-        question = example["instruction"]
+    # Process examples in batches for better progress tracking
+    predictions = []
+    gold_queries = []
+    
+    for i, example in enumerate(tqdm(examples, desc="Generating SQL queries")):
         db_id = example.get("db_id", "")
-        external_knowledge = example.get("external_knowledge", "")
+        question = example.get("question", "")
+        gold_query = example.get("query", "")
         
-        sql_file_path = os.path.join(output_dir, f"{instance_id}.sql")
-        if os.path.exists(sql_file_path):
-            print(f"Prediction for {instance_id} already exists, skipping...")
+        # Skip if no question or database ID
+        if not question or not db_id:
+            print(f"Skipping example {i}: Missing question or database ID")
             continue
             
+        # Generate SQL query
         generated_sql = generate_sql_from_prompt(
             model, 
             tokenizer, 
             question,
-            db_id=db_id, 
-            external_knowledge=external_knowledge
+            db_id=db_id
         )
         
-        with open(sql_file_path, 'w') as f:
-            f.write(generated_sql)
-        print(f"Generated SQL for {instance_id}")
+        # Clean up the generated SQL
+        if generated_sql:
+            # Remove any markdown formatting that might be in the response
+            if "```sql" in generated_sql:
+                generated_sql = generated_sql.split("```sql")[1].split("```")[0].strip()
+            elif "```" in generated_sql:
+                generated_sql = generated_sql.split("```")[1].split("```")[0].strip()
+            
+            # Normalize SQL for evaluation
+            generated_sql = normalize_sql(generated_sql)
+        
+        # Store prediction and gold query
+        predictions.append(generated_sql)
+        gold_queries.append(f"{gold_query}\t{db_id}")
+        
+        # Log progress periodically
+        if (i + 1) % 10 == 0:
+            print(f"Processed {i + 1}/{len(examples)} examples")
     
-    gold_dir = os.path.join(eval_suite_path, "gold")
-    eval_script = os.path.join(eval_suite_path, "evaluate.py")
+    # Write predictions to file
+    with open(pred_file_path, 'w') as f:
+        for sql in predictions:
+            f.write(f"{sql}\n")
+    
+    # Write gold queries to file
+    with open(gold_file_path, 'w') as f:
+        for gold in gold_queries:
+            f.write(f"{gold}\n")
+    
+    print(f"Generated SQL queries written to {pred_file_path}")
+    print(f"Gold SQL queries written to {gold_file_path}")
+    
+    # Try to run the Spider evaluation script
+    eval_script = os.path.join(spider_dir, "spider", "evaluation.py")
     
     if not os.path.exists(eval_script):
-        print(f"Evaluation script not found at {eval_script}")
-        return {"predictions": examples, "evaluation_metrics": {}}
+        print(f"Spider evaluation script not found at {eval_script}")
+        # Try alternative path
+        alternative_path = os.path.join(spider_dir, "evaluation.py")
+        if os.path.exists(alternative_path):
+            eval_script = alternative_path
+            print(f"Found Spider evaluation script at {eval_script}")
+        else:
+            print(f"Spider evaluation script not found. Skipping evaluation.")
+            return {"predictions": predictions, "gold": gold_queries}
     
-    print(f"Found evaluation script at {eval_script}")
-    print(f"Using gold directory: {gold_dir}")
-    print(f"Using result directory: {os.path.abspath(output_dir)}")
+    print(f"Running Spider evaluation with script at {eval_script}")
     
-    cmd = [
-        sys.executable,
-        eval_script,
-        "--mode", "sql",
-        "--result_dir", os.path.abspath(output_dir),
-        "--gold_dir", gold_dir
-    ]
-    
-    print("Running Spider2-snow evaluation with command:")
-    print(" ".join(cmd))
     try:
+        cmd = [
+            sys.executable,
+            eval_script,
+            "--gold", gold_file_path,
+            "--pred", pred_file_path,
+            "--etype", "all",  # Evaluate all types of queries
+            "--db", os.path.join(spider_dir, "spider", "database")  # Path to the database files
+        ]
+        
+        print("Executing command:", " ".join(cmd))
         completed_process = subprocess.run(
             cmd, 
             check=True, 
             capture_output=True, 
             text=True
         )
+        
         print("Evaluation completed successfully.")
         print(completed_process.stdout)
         
+        # Parse evaluation results
         eval_metrics = {}
         for line in completed_process.stdout.split('\n'):
-            if line.startswith("Final score:"):
-                parts = line.split(",")
-                if len(parts) >= 3:
-                    eval_metrics["execution_accuracy"] = float(parts[0].split(":")[1].strip())
-                    eval_metrics["correct_examples"] = int(parts[1].split(":")[1].strip())
-                    eval_metrics["total_examples"] = int(parts[2].split(":")[1].strip())
-        
-        log_file = os.path.join(os.getcwd(), "log.txt")
-        if os.path.exists(log_file):
-            with open(log_file, 'r') as f:
-                eval_metrics["detailed_log"] = f.read()
+            if "exact matching accuracy:" in line:
+                eval_metrics["exact_match"] = float(line.split(":")[1].strip())
+            elif "execution accuracy:" in line:
+                eval_metrics["execution"] = float(line.split(":")[1].strip())
+            elif "partial matching accuracy:" in line:
+                eval_metrics["partial_match"] = float(line.split(":")[1].strip())
         
         print("Evaluation Metrics:")
         for key, value in eval_metrics.items():
-            if key != "detailed_log": 
-                print(f"{key}: {value}")
-                
-        results = {"predictions": examples, "evaluation_metrics": eval_metrics}
-        predictions_file = os.path.join(os.getcwd(), "spider_predictions.json")
-        with open(predictions_file, 'w') as f:
+            print(f"{key}: {value}")
+        
+        results = {
+            "predictions": predictions, 
+            "gold": gold_queries, 
+            "evaluation_metrics": eval_metrics
+        }
+        
+        # Save results to JSON file
+        results_file = os.path.join(output_dir, "spider_results.json")
+        with open(results_file, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"Processed {len(examples)} examples, predictions saved to spider_predictions.json")
-                
+            
+        print(f"Evaluation results saved to {results_file}")
         return results
         
-    except subprocess.CalledProcessError as e:
-        print("Error running evaluation suite:")
-        print(e.stderr)
-        results = {"predictions": examples, "evaluation_metrics": {"error": e.stderr}}
-        predictions_file = os.path.join(os.getcwd(), "spider_predictions.json")
-        with open(predictions_file, 'w') as f:
+    except Exception as e:
+        print(f"Error running evaluation script: {e}")
+        if hasattr(e, 'stderr'):
+            print(e.stderr)
+        
+        results = {
+            "predictions": predictions, 
+            "gold": gold_queries, 
+            "error": str(e)
+        }
+        
+        # Save results even if evaluation failed
+        results_file = os.path.join(output_dir, "spider_results.json")
+        with open(results_file, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"Processed {len(examples)} examples, predictions saved to spider_predictions.json")
+            
+        print(f"Results saved to {results_file} (without evaluation metrics)")
         return results
 
 def main():
@@ -585,7 +647,7 @@ def main():
         model = AutoModelForCausalLM.from_pretrained(
             output_dir,
             device_map="auto",
-            torch_dtype=torch.float16,  
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.bfloat16,
             low_cpu_mem_usage=True
         )
         
@@ -594,11 +656,15 @@ def main():
             
         print("Model loaded with inference optimizations")
         
+        # Use the Spider dataset structure from the repository
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        spider_dir = os.path.join(current_dir)
+        
         results = process_spider_dataset(model, tokenizer, spider_dir, batch_size=4)
         if results:
             predictions = results.get("predictions", [])
             metrics = results.get("evaluation_metrics", {})
-            print(f"Processed {len(predictions)} examples, predictions saved to spider_predictions.json")
+            print(f"Processed {len(predictions)} examples")
             if metrics:
                 print("Spider Evaluation Metrics:")
                 for key, value in metrics.items():

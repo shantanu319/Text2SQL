@@ -1,0 +1,90 @@
+{
+  "predictions": [
+    {
+      "question": "return me the homepage of PVLDB .",
+      "db_id": "academic",
+      "gold_query": "SELECT JOURNALalias0.HOMEPAGE FROM JOURNAL AS JOURNALalias0 WHERE JOURNALalias0.NAME = \"PVLDB\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the homepage of H. V. Jagadish .",
+      "db_id": "academic",
+      "gold_query": "SELECT AUTHORalias0.HOMEPAGE FROM AUTHOR AS AUTHORalias0 WHERE AUTHORalias0.NAME = \"H. V. Jagadish\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the abstract of Making database systems usable .",
+      "db_id": "academic",
+      "gold_query": "SELECT PUBLICATIONalias0.ABSTRACT FROM PUBLICATION AS PUBLICATIONalias0 WHERE PUBLICATIONalias0.TITLE = \"Making database systems usable\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the year of Making database systems usable",
+      "db_id": "academic",
+      "gold_query": "SELECT PUBLICATIONalias0.YEAR FROM PUBLICATION AS PUBLICATIONalias0 WHERE PUBLICATIONalias0.TITLE = \"Making database systems usable\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the year of Making database systems usable .",
+      "db_id": "academic",
+      "gold_query": "SELECT PUBLICATIONalias0.YEAR FROM PUBLICATION AS PUBLICATIONalias0 WHERE PUBLICATIONalias0.TITLE = \"Making database systems usable\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the papers after 2000 .",
+      "db_id": "academic",
+      "gold_query": "SELECT PUBLICATIONalias0.TITLE FROM PUBLICATION AS PUBLICATIONalias0 WHERE PUBLICATIONalias0.YEAR > 2000 ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me the homepage of the VLDB conference .",
+      "db_id": "academic",
+      "gold_query": "SELECT CONFERENCEalias0.HOMEPAGE FROM CONFERENCE AS CONFERENCEalias0 WHERE CONFERENCEalias0.NAME = \"VLDB\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me all the keywords .",
+      "db_id": "academic",
+      "gold_query": "SELECT KEYWORDalias0.KEYWORD FROM KEYWORD AS KEYWORDalias0 ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me all the organizations .",
+      "db_id": "academic",
+      "gold_query": "SELECT ORGANIZATIONalias0.NAME FROM ORGANIZATION AS ORGANIZATIONalias0 ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    },
+    {
+      "question": "return me all the organizations in North America .",
+      "db_id": "academic",
+      "gold_query": "SELECT ORGANIZATIONalias0.NAME FROM ORGANIZATION AS ORGANIZATIONalias0 WHERE ORGANIZATIONalias0.CONTINENT = \"North America\" ;",
+      "predicted_query": "SELECT * FROM error_table;",
+      "exact_match": false,
+      "execution_match": false
+    }
+  ],
+  "execution_results": [],
+  "metrics": {
+    "execution_accuracy": 0.0,
+    "exact_match": 0.0,
+    "total": 10
+  }
+}
