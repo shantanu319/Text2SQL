@@ -1,207 +1,157 @@
 [
   {
     "instruction": "Generate a SQL query to find all employees who earn more than $50,000.",
-    "input": "Database has tables: employees(id, name, salary, department_id), departments(id, name, location)",
-    "output": "SELECT name FROM employees WHERE salary > 50000;"
+    "input": "Database has tables: employee_hire_evaluation.employee(id, name, employee_ID, date_of_hire, job_title, salary), employee_hire_evaluation.department(department_ID, name, creation, last_update_date, department_head)",
+    "output": "SELECT name FROM employee_hire_evaluation.employee WHERE salary > 50000;"
   },
   {
     "instruction": "Create a query to list the names of all customers who have placed an order in the last month.",
-    "input": "Database has tables: customers(id, name, email, address), orders(id, customer_id, order_date, total_amount)",
-    "output": "SELECT DISTINCT c.name FROM customers c JOIN orders o ON c.id = o.customer_id WHERE o.order_date >= DATE('now', '-1 month');"
+    "input": "Database has tables: yelp.business(business_id, name, neighborhood, address, city, state, postal_code, latitude, longitude, stars, review_count, is_open, categories), yelp.review(business_id, review_id, user_id, stars, date, text, useful, funny, cool)",
+    "output": "SELECT DISTINCT b.name FROM yelp.business b JOIN yelp.review r ON b.business_id = r.business_id WHERE r.date >= DATE('now', '-1 month');"
   },
   {
-    "instruction": "Find the total revenue by product category.",
-    "input": "Database has tables: products(id, name, price, category_id), orders(id, customer_id, order_date), order_items(order_id, product_id, quantity), categories(id, name)",
-    "output": "SELECT c.name, SUM(p.price * oi.quantity) as total_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id GROUP BY c.name ORDER BY total_revenue DESC;"
+    "instruction": "Find the total number of matches won by players from each country.",
+    "input": "Database has tables: wta_1.players(player_id, first_name, last_name, hand, birth_date, country_code), wta_1.matches(match_id, winner_id, loser_id, winner_rank, loser_rank, winner_rank_points, loser_rank_points, tourney_id, score), wta_1.rankings(date, ranking, player_id, ranking_points)",
+    "output": "SELECT p.country_code, COUNT(m.match_id) as total_wins FROM wta_1.players p JOIN wta_1.matches m ON p.player_id = m.winner_id GROUP BY p.country_code ORDER BY total_wins DESC;"
   },
   {
-    "instruction": "Get a list of all customers who have spent more than $1000 in total.",
-    "input": "Database has tables: customers(id, name, email), orders(id, customer_id, order_date, total_amount)",
-    "output": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.name HAVING SUM(o.total_amount) > 1000 ORDER BY total_spent DESC;"
+    "instruction": "Get a list of all properties with a sale price more than $1000.",
+    "input": "Database has tables: real_estate_properties.other_available_features(feature_id, feature_type_code, feature_name), real_estate_properties.properties(property_id, date_of_construction, property_type_code, property_address, accommodation_count, monthly_rental_rate, sale_price)",
+    "output": "SELECT property_address, sale_price FROM real_estate_properties.properties WHERE sale_price > 1000 ORDER BY sale_price DESC;"
   },
   {
-    "instruction": "List the top 5 most viewed products in the last week.",
-    "input": "Database has tables: products(id, name, price, category_id), page_views(id, product_id, user_id, view_date, duration)",
-    "output": "SELECT p.name, COUNT(pv.id) as view_count FROM products p JOIN page_views pv ON p.id = pv.product_id WHERE pv.view_date >= DATE('now', '-7 days') GROUP BY p.id, p.name ORDER BY view_count DESC LIMIT 5;"
+    "instruction": "List the top 5 movies with the most actors.",
+    "input": "Database has tables: imdb.movie(mid, title, release_year, title_aka, budget), imdb.actor(aid, gender, name, nationality, birth_city, birth_year), imdb.cast(id, msid, aid, role)",
+    "output": "SELECT m.title, COUNT(c.aid) as actor_count FROM imdb.movie m JOIN imdb.cast c ON m.mid = c.msid GROUP BY m.mid, m.title ORDER BY actor_count DESC LIMIT 5;"
   },
   {
-    "instruction": "Find all sessions where customers viewed at least 5 pages but didn't make a purchase.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), hits(hitNumber, time, isInteraction, type, page_path), totals(visits, hits, pageviews, transactions)",
-    "output": "SELECT s.fullVisitorId, s.visitId, s.date, t.pageviews FROM ga_sessions s JOIN totals t ON s.visitId = t.visitId WHERE t.pageviews >= 5 AND (t.transactions IS NULL OR t.transactions = 0) ORDER BY t.pageviews DESC;"
+    "instruction": "Find all stadiums that have hosted at least 5 concerts.",
+    "input": "Database has tables: concert_singer.stadium(Stadium_ID, Location, Name, Capacity, Highest, Lowest, Average), concert_singer.singer(Singer_ID, Name, Country, Song_Name, Song_release_year, Age, Is_male), concert_singer.concert(concert_ID, concert_Name, Theme, Stadium_ID, Year)",
+    "output": "SELECT s.Name, COUNT(c.concert_ID) as num_concerts FROM concert_singer.stadium s JOIN concert_singer.concert c ON s.Stadium_ID = c.Stadium_ID GROUP BY s.Stadium_ID, s.Name HAVING COUNT(c.concert_ID) >= 5;"
   },
   {
-    "instruction": "Identify customers who have visited the website from both mobile and desktop devices.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), device(deviceCategory, browser, operatingSystem)",
-    "output": "SELECT s.fullVisitorId FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'mobile' INTERSECT SELECT s.fullVisitorId FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'desktop';"
+    "instruction": "Find golden retrievers and their trainers.",
+    "input": "Database has tables: dog_kennels.dogs(dog_id, name, age, breed, date_of_birth, gender, weight, abandoned, dog_kennel_id), dog_kennels.professionals(professional_id, role_code, first_name, last_name, street, city, zip_code, state, email_address)",
+    "output": "SELECT d.name as dog_name, p.first_name, p.last_name FROM dog_kennels.dogs d JOIN dog_kennels.professionals p WHERE d.breed = 'Golden Retriever' AND p.role_code = 'Trainer';"
   },
   {
-    "instruction": "Calculate the monthly sales growth percentage for each product category in 2022.",
-    "input": "Database has tables: orders(id, order_date, total_amount), order_items(order_id, product_id, quantity, item_price), products(id, name, category_id), categories(id, name)",
-    "output": "WITH monthly_sales AS (SELECT c.id, c.name, EXTRACT(MONTH FROM o.order_date) as month, SUM(oi.quantity * oi.item_price) as monthly_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id JOIN orders o ON oi.order_id = o.id WHERE EXTRACT(YEAR FROM o.order_date) = 2022 GROUP BY c.id, c.name, EXTRACT(MONTH FROM o.order_date)) SELECT m1.name, m1.month, m1.monthly_revenue, ((m1.monthly_revenue - m2.monthly_revenue) / m2.monthly_revenue) * 100 as growth_percentage FROM monthly_sales m1 JOIN monthly_sales m2 ON m1.id = m2.id AND m1.month = m2.month + 1 ORDER BY m1.name, m1.month;"
+    "instruction": "Calculate the monthly growth of publications in 2022.",
+    "input": "Database has tables: academic.publication(abstract, cid, citation_num, jid, pid, reference_num, title, year), academic.author(aid, homepage, name, oid), academic.writes(aid, pid), academic.conference(cid, homepage, name)",
+    "output": "WITH monthly_publications AS (SELECT EXTRACT(MONTH FROM year) as month, COUNT(pid) as monthly_count FROM academic.publication WHERE year = 2022 GROUP BY EXTRACT(MONTH FROM year)) SELECT m1.month, ((m1.monthly_count - m2.monthly_count) / m2.monthly_count) * 100 as growth_percentage FROM monthly_publications m1 JOIN monthly_publications m2 ON m1.month = m2.month + 1 ORDER BY m1.month;"
   },
   {
-    "instruction": "Find the average time between a user's first visit and their first purchase.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), hits(hitNumber, time, isInteraction, type), transactions(transactionId, visitId, date, totalTransactionRevenue)",
-    "output": "WITH first_visits AS (SELECT fullVisitorId, MIN(visitStartTime) as first_visit_time FROM ga_sessions GROUP BY fullVisitorId), first_purchases AS (SELECT s.fullVisitorId, MIN(t.date) as first_purchase_date FROM ga_sessions s JOIN transactions t ON s.visitId = t.visitId GROUP BY s.fullVisitorId) SELECT AVG(UNIX_TIMESTAMP(fp.first_purchase_date) - fv.first_visit_time) / 86400 as avg_days_to_purchase FROM first_visits fv JOIN first_purchases fp ON fv.fullVisitorId = fp.fullVisitorId;"
+    "instruction": "Find the average time between a TV show's episodes airing.",
+    "input": "Database has tables: tvshow.TV_Channel(id, series_name, Country, Language, Content, Pixel_aspect_ratio_PAR, HD_or_SD), tvshow.TV_series(id, Episode, Air_Date, Rating, Share, 18_49_Rating_Share, Viewers, Weekly_Rank, Channel)",
+    "output": "SELECT c.series_name, AVG(JULIANDAY(t2.Air_Date) - JULIANDAY(t1.Air_Date)) as avg_days_between FROM tvshow.TV_Channel c JOIN tvshow.TV_series t1 ON c.id = t1.Channel JOIN tvshow.TV_series t2 ON t1.Channel = t2.Channel WHERE t1.Episode + 1 = t2.Episode GROUP BY c.series_name;"
   },
   {
-    "instruction": "Generate a report of weekly bounce rates by traffic source for the last quarter.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, visitStartTime, date), trafficSource(source, medium, campaign), totals(visits, bounces, pageviews)",
-    "output": "SELECT DATE_TRUNC('week', s.date) as week, ts.source, COUNT(s.visitId) as total_sessions, SUM(CASE WHEN t.bounces = 1 THEN 1 ELSE 0 END) as bounced_sessions, (SUM(CASE WHEN t.bounces = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(s.visitId)) as bounce_rate FROM ga_sessions s JOIN trafficSource ts ON s.visitId = ts.visitId JOIN totals t ON s.visitId = t.visitId WHERE s.date >= DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '3 months' GROUP BY DATE_TRUNC('week', s.date), ts.source ORDER BY week, bounce_rate DESC;"
+    "instruction": "Generate a report of weekly flights between airports.",
+    "input": "Database has tables: atis.flight(flight_id, flight_days, from_airport, to_airport, departure_time, arrival_time), atis.airport(airport_code, airport_name, airport_location, state_code, country_name, time_zone_code)",
+    "output": "SELECT f.flight_id, a1.airport_name as departure_airport, a2.airport_name as arrival_airport, COUNT(*) as weekly_flights FROM atis.flight f JOIN atis.airport a1 ON f.from_airport = a1.airport_code JOIN atis.airport a2 ON f.to_airport = a2.airport_code GROUP BY f.flight_id, a1.airport_name, a2.airport_name ORDER BY weekly_flights DESC;"
   },
   {
-    "instruction": "Find products that have been viewed but never purchased.",
-    "input": "Database has tables: products(id, name, category_id), page_views(id, product_id, user_id, view_date), order_items(order_id, product_id, quantity)",
-    "output": "SELECT p.id, p.name FROM products p WHERE EXISTS (SELECT 1 FROM page_views pv WHERE pv.product_id = p.id) AND NOT EXISTS (SELECT 1 FROM order_items oi WHERE oi.product_id = p.id);"
+    "instruction": "Find students who haven't completed any transcripts.",
+    "input": "Database has tables: student_transcripts_tracking.Students(student_id, first_name, middle_name, last_name, date_of_birth, gender, degree_program_id), student_transcripts_tracking.Degree_Programs(degree_program_id, department_id, degree_summary_name, degree_summary_description), student_transcripts_tracking.Transcripts(transcript_id, transcript_date, transcript_status, student_id)",
+    "output": "SELECT s.first_name, s.last_name, d.degree_summary_name FROM student_transcripts_tracking.Students s JOIN student_transcripts_tracking.Degree_Programs d ON s.degree_program_id = d.degree_program_id WHERE NOT EXISTS (SELECT 1 FROM student_transcripts_tracking.Transcripts t WHERE t.student_id = s.student_id);"
   },
   {
-    "instruction": "Calculate the retention rate of users who made a purchase in January 2022 and returned to make another purchase in February 2022.",
-    "input": "Database has tables: users(id, name, email, registration_date), orders(id, user_id, order_date, total_amount)",
-    "output": "WITH jan_purchasers AS (SELECT DISTINCT user_id FROM orders WHERE order_date BETWEEN '2022-01-01' AND '2022-01-31'), feb_purchasers AS (SELECT DISTINCT user_id FROM orders WHERE order_date BETWEEN '2022-02-01' AND '2022-02-28') SELECT COUNT(DISTINCT feb_purchasers.user_id) * 100.0 / COUNT(DISTINCT jan_purchasers.user_id) as retention_rate FROM jan_purchasers LEFT JOIN feb_purchasers ON jan_purchasers.user_id = feb_purchasers.user_id;"
+    "instruction": "Calculate the retention rate of car makes between given ID ranges.",
+    "input": "Database has tables: car_1.cars_data(Id, MakeId, Model, MSRP, Year, Invoice, EngineSize, Cylinders, Horsepower, MPG_City, MPG_Highway, Weight, Wheelbase), car_1.car_makers(Id, Maker, FullName, Country)",
+    "output": "WITH group1 AS (SELECT c.MakeId FROM car_1.cars_data c WHERE c.Id BETWEEN 100 AND 200), group2 AS (SELECT c.MakeId FROM car_1.cars_data c WHERE c.Id BETWEEN 201 AND 300) SELECT COUNT(DISTINCT group2.MakeId) * 100.0 / COUNT(DISTINCT group1.MakeId) as retention_rate FROM group1 LEFT JOIN group2 ON group1.MakeId = group2.MakeId;"
   },
   {
-    "instruction": "List all books published after 2020 with their authors.",
-    "input": "Database has tables: books(id, title, publication_year, publisher_id), authors(id, name, country), book_authors(book_id, author_id)",
-    "output": "SELECT b.title, a.name FROM books b JOIN book_authors ba ON b.id = ba.book_id JOIN authors a ON ba.author_id = a.id WHERE b.publication_year > 2020;"
+    "instruction": "List all ships lost in battles after a certain date.",
+    "input": "Database has tables: battle_death.battle(id, name, date, bulgarian_commander, latin_commander, result), battle_death.ship(lost_in_battle, id, name, tonnage, ship_type, country, date_sunk)",
+    "output": "SELECT b.name as battle_name, s.name as ship_name FROM battle_death.battle b JOIN battle_death.ship s ON s.lost_in_battle = b.id WHERE CAST(SUBSTR(b.date, 1, 4) AS INTEGER) > 2000;"
   },
   {
-    "instruction": "Get the average rating for each movie genre.",
-    "input": "Database has tables: movies(id, title, year, genre_id), ratings(id, movie_id, user_id, score), genres(id, name)",
-    "output": "SELECT g.name, AVG(r.score) as average_rating FROM genres g JOIN movies m ON g.id = m.genre_id JOIN ratings r ON m.id = r.movie_id GROUP BY g.name;"
+    "instruction": "Get the average release year for each movie genre.",
+    "input": "Database has tables: imdb.movie(mid, title, release_year, title_aka, budget), imdb.genre(gid, genre), imdb.classification(id, msid, gid), imdb.copyright(id, msid, cid)",
+    "output": "SELECT g.genre, AVG(m.release_year) as average_year FROM imdb.genre g JOIN imdb.classification c ON g.gid = c.gid JOIN imdb.movie m ON c.msid = m.mid GROUP BY g.genre ORDER BY average_year DESC;"
   },
   {
-    "instruction": "Find students who have enrolled in all available courses.",
-    "input": "Database has tables: students(id, name, email), courses(id, name, department), enrollments(student_id, course_id, semester)",
-    "output": "SELECT s.name FROM students s WHERE NOT EXISTS (SELECT c.id FROM courses c WHERE NOT EXISTS (SELECT * FROM enrollments e WHERE e.student_id = s.id AND e.course_id = c.id));"
+    "instruction": "Find teachers who have taught all available courses.",
+    "input": "Database has tables: course_teach.course(course_id, staring_date, course_name), course_teach.teacher(teacher_id, name, age, hometown), course_teach.course_arrange(course_id, teacher_id, room_id)",
+    "output": "SELECT t.name as teacher_name FROM course_teach.teacher t WHERE NOT EXISTS (SELECT c.course_id FROM course_teach.course c WHERE NOT EXISTS (SELECT * FROM course_teach.course_arrange ca WHERE ca.teacher_id = t.teacher_id AND ca.course_id = c.course_id));"
   },
   {
-    "instruction": "Get the top 5 products by sales quantity.",
-    "input": "Database has tables: products(id, name, price), sales(id, date, customer_id), sale_items(sale_id, product_id, quantity)",
-    "output": "SELECT p.name, SUM(si.quantity) as total_quantity FROM products p JOIN sale_items si ON p.id = si.product_id GROUP BY p.id ORDER BY total_quantity DESC LIMIT 5;"
+    "instruction": "Get the top 5 publications with the most authors.",
+    "input": "Database has tables: scholar.publication(pid, title, year, venue, citation_num), scholar.author(aid, name, gender, job_title, institution), scholar.writes(pid, aid, signature)",
+    "output": "SELECT p.title, COUNT(w.aid) as author_count FROM scholar.publication p JOIN scholar.writes w ON p.pid = w.pid GROUP BY p.pid, p.title ORDER BY author_count DESC LIMIT 5;"
   },
   {
-    "instruction": "Find departments with more than 10 employees.",
-    "input": "Database has tables: employees(id, name, salary, department_id), departments(id, name, location)",
-    "output": "SELECT d.name, COUNT(*) as employee_count FROM departments d JOIN employees e ON d.id = e.department_id GROUP BY d.id HAVING COUNT(*) > 10;"
+    "instruction": "Find job titles with more than 10 employees.",
+    "input": "Database has tables: employee_hire_evaluation.employee(id, name, employee_ID, date_of_hire, job_title, salary), employee_hire_evaluation.evaluation(id, employee_ID, year_awarded, quarter, evaluation_results)",
+    "output": "SELECT job_title, COUNT(*) as employee_count FROM employee_hire_evaluation.employee GROUP BY job_title HAVING COUNT(*) > 10;"
   },
   {
-    "instruction": "List all customers who have never placed an order.",
-    "input": "Database has tables: customers(id, name, email), orders(id, customer_id, order_date)",
-    "output": "SELECT c.name FROM customers c LEFT JOIN orders o ON c.id = o.customer_id WHERE o.id IS NULL;"
+    "instruction": "List all users who have never written a review.",
+    "input": "Database has tables: yelp.business(business_id, name, neighborhood, address, city, state, postal_code, latitude, longitude, stars, review_count, is_open, categories), yelp.users(user_id, name, review_count, yelping_since, useful, funny, cool, fans, average_stars), yelp.review(review_id, user_id, business_id, stars, date, text, useful, funny, cool)",
+    "output": "SELECT u.name FROM yelp.users u LEFT JOIN yelp.review r ON u.user_id = r.user_id WHERE r.review_id IS NULL;"
   },
   {
-    "instruction": "Find the most expensive product in each category.",
-    "input": "Database has tables: products(id, name, price, category_id), categories(id, name)",
-    "output": "SELECT c.name as category, p.name as product, p.price FROM products p JOIN categories c ON p.category_id = c.id WHERE p.price = (SELECT MAX(price) FROM products WHERE category_id = c.id);"
+    "instruction": "Find the most populated city in each country.",
+    "input": "Database has tables: world_1.city(id, name, country_code, district, population), world_1.country(code, name, continent, region, surface_area, indep_year, population, life_expectancy, gnp)",
+    "output": "SELECT co.name as country, ci.name as city, ci.population FROM world_1.city ci JOIN world_1.country co ON ci.country_code = co.code WHERE ci.population = (SELECT MAX(population) FROM world_1.city WHERE country_code = co.code);"
   },
   {
-    "instruction": "Show all columns from table where a specific condition is met.",
-    "input": "Database has tables: users(id, name, age, email, created_at)",
-    "output": "SELECT * FROM users WHERE age > 25;"
+    "instruction": "Show all female participants in a voting system.",
+    "input": "Database has tables: voter_1.votes(id, created, state, participant_id, election_id, votes), voter_1.participants(id, name, date_of_birth, gender, phone_number, street_number, zip_id)",
+    "output": "SELECT * FROM voter_1.participants WHERE gender = 'F';"
   },
   {
-    "instruction": "List columns from a table ordered by a specific column in ascending or descending order.",
-    "input": "Database has tables: products(id, name, price, stock)",
-    "output": "SELECT name, price FROM products ORDER BY price DESC;"
+    "instruction": "List singers ordered by age in descending order.",
+    "input": "Database has tables: singer.singer(Singer_ID, Name, Country, Song_Name, Song_release_year, Age, Is_male), singer.concert(concert_ID, concert_Name, Theme, Stadium_ID, Year, Singer_ID)",
+    "output": "SELECT Name, Age FROM singer.singer ORDER BY Age DESC;"
   },
   {
-    "instruction": "Count the total number of items in a table.",
-    "input": "Database has tables: customers(id, name, email, signup_date)",
-    "output": "SELECT COUNT(id) AS total_count FROM customers;"
+    "instruction": "Count the total number of students in a high school.",
+    "input": "Database has tables: network_1.Friend(friend_id, friend_first, friend_last, gender), network_1.Highschooler(student_id, name, grade), network_1.Likes(student_id, liked_id)",
+    "output": "SELECT COUNT(*) FROM network_1.Highschooler;"
   },
   {
-    "instruction": "Show records between two dates.",
-    "input": "Database has tables: orders(id, customer_id, order_date, total_amount)",
-    "output": "SELECT * FROM orders WHERE order_date BETWEEN '2023-01-01' AND '2023-12-31';"
+    "instruction": "Find the restaurants with highest ratings in each city.",
+    "input": "Database has tables: restaurants.Restaurant(ID, NAME, FOOD_TYPE, CITY_NAME, RATING), restaurants.Geographic(CITY_NAME, COUNTY, REGION), restaurants.Location(RESTAURANT_ID, HOUSE_NUMBER, STREET_NAME, CITY_NAME)",
+    "output": "SELECT g.CITY_NAME, r.NAME, r.RATING FROM restaurants.Restaurant r JOIN restaurants.Geographic g ON r.CITY_NAME = g.CITY_NAME WHERE r.RATING = (SELECT MAX(RATING) FROM restaurants.Restaurant WHERE CITY_NAME = g.CITY_NAME);"
   },
   {
-    "instruction": "Rank items by a specific metric.",
-    "input": "Database has tables: employees(id, name, department, salary, hire_date)",
-    "output": "WITH ranked AS (SELECT *, ROW_NUMBER() OVER (ORDER BY salary DESC) AS rank FROM employees) SELECT * FROM ranked WHERE rank <= 5;"
+    "instruction": "List all states that border California.",
+    "input": "Database has tables: geography.state(state_name, population, area, country_name, capital, density), geography.border_info(state_name, border), geography.city(city_name, population, country_name, state_name)",
+    "output": "SELECT b.border FROM geography.border_info b WHERE b.state_name = 'California';"
   },
   {
-    "instruction": "Find matching records between two tables based on a condition.",
-    "input": "Database has tables: customers(id, name, city), orders(id, customer_id, amount, date)",
-    "output": "SELECT name FROM customers WHERE id IN (SELECT customer_id FROM orders WHERE amount > 1000);"
+    "instruction": "Find all museums visited more than 100 times.",
+    "input": "Database has tables: museum_visit.museum(Museum_ID, Name, Type, Region), museum_visit.visit(visit_id, Museum_ID, visitor_id, Date, Total_Spent), museum_visit.visitor(visitor_id, Name, Age, Phone, Member_Status)",
+    "output": "SELECT m.Name, COUNT(v.visit_id) as visit_count FROM museum_visit.museum m JOIN museum_visit.visit v ON m.Museum_ID = v.Museum_ID GROUP BY m.Museum_ID, m.Name HAVING COUNT(v.visit_id) > 100;"
   },
   {
-    "instruction": "Calculate the average order amount by month.",
-    "input": "Database has tables: orders(id, customer_id, order_date, total_amount)",
-    "output": "SELECT strftime('%Y-%m', order_date) as month, AVG(total_amount) as average_amount FROM orders GROUP BY month ORDER BY month;"
+    "instruction": "List all pets and their owners.",
+    "input": "Database has tables: pets_1.Pets(pet_id, name, age, pet_type, weight, pet_color), pets_1.Owners(owner_id, name, address, date_of_birth), pets_1.Has_Pet(owner_id, pet_id, start_date)",
+    "output": "SELECT o.name as owner_name, p.name as pet_name, p.pet_type FROM pets_1.Owners o JOIN pets_1.Has_Pet hp ON o.owner_id = hp.owner_id JOIN pets_1.Pets p ON hp.pet_id = p.pet_id;"
   },
   {
-    "instruction": "Find products that have never been ordered.",
-    "input": "Database has tables: products(id, name, price), order_items(order_id, product_id, quantity)",
-    "output": "SELECT p.name FROM products p LEFT JOIN order_items oi ON p.id = oi.product_id WHERE oi.order_id IS NULL;"
+    "instruction": "Find the average student age for each program.",
+    "input": "Database has tables: advising.student(student_id, lastname, firstname, program_id, declare_major, total_credit, total_gpa), advising.program(program_id, name, college, introduction), advising.course(course_id, name, department, credits)",
+    "output": "SELECT p.name, AVG(s.total_credit / 30.0 + 18) as avg_age FROM advising.program p JOIN advising.student s ON p.program_id = s.program_id GROUP BY p.program_id, p.name;"
   },
   {
-    "instruction": "Get the total sales amount for each salesperson.",
-    "input": "Database has tables: salespeople(id, name, region_id), sales(id, salesperson_id, amount, date)",
-    "output": "SELECT sp.name, SUM(s.amount) as total_sales FROM salespeople sp LEFT JOIN sales s ON sp.id = s.salesperson_id GROUP BY sp.id;"
+    "instruction": "List all orchestras with more than 50 members.",
+    "input": "Database has tables: orchestra.orchestra(Orchestra_ID, Orchestra_Name, Conductor, Record_Company, Year_Formed, Major_Record_Format), orchestra.performance(Performance_ID, Orchestra_ID, Venue, Date, Attendance), orchestra.conductor(Conductor_ID, Name, Age, Nationality)",
+    "output": "SELECT o.Orchestra_Name, COUNT(p.Performance_ID) as performance_count FROM orchestra.orchestra o JOIN orchestra.performance p ON o.Orchestra_ID = p.Orchestra_ID GROUP BY o.Orchestra_ID, o.Orchestra_Name HAVING COUNT(p.Performance_ID) > 50;"
   },
   {
-    "instruction": "Find customers who have purchased all products in a specific category.",
-    "input": "Database has tables: customers(id, name), products(id, name, category_id), orders(id, customer_id), order_items(order_id, product_id)",
-    "output": "SELECT c.name FROM customers c WHERE NOT EXISTS (SELECT p.id FROM products p WHERE p.category_id = 3 AND NOT EXISTS (SELECT oi.order_id FROM orders o JOIN order_items oi ON o.id = oi.order_id WHERE o.customer_id = c.id AND oi.product_id = p.id));"
+    "instruction": "Find the highest ranking poker player from each country.",
+    "input": "Database has tables: poker_player.poker_player(Poker_Player_ID, Name, Nationality, Earnings, World_Rank), poker_player.tournament(Tournament_ID, Name, Location, Buy_in, Year), poker_player.participates(Poker_Player_ID, Tournament_ID, Result, Prize_Amount, Final_Table)",
+    "output": "SELECT p.Nationality, p.Name, MIN(p.World_Rank) as best_rank FROM poker_player.poker_player p GROUP BY p.Nationality;"
   },
   {
-    "instruction": "Analyze the conversion funnel by calculating the percentage of users who progress from page view to add-to-cart to purchase.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, date), hits(hitNumber, visitId, eventInfo_eventCategory, eventInfo_eventAction, page_pagePath), eCommerceAction(action_type)",
-    "output": "WITH page_viewers AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId WHERE h.page_pagePath LIKE '/product/%'), cart_adders AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId WHERE h.eventInfo_eventCategory = 'ecommerce' AND h.eventInfo_eventAction = 'add_to_cart'), purchasers AS (SELECT COUNT(DISTINCT fullVisitorId) as count FROM ga_sessions s JOIN hits h ON s.visitId = h.visitId JOIN eCommerceAction e ON h.hitNumber = e.hitNumber WHERE e.action_type = '6') SELECT page_viewers.count as page_viewers, cart_adders.count as cart_adders, purchasers.count as purchasers, (cart_adders.count * 100.0 / page_viewers.count) as view_to_cart_rate, (purchasers.count * 100.0 / cart_adders.count) as cart_to_purchase_rate, (purchasers.count * 100.0 / page_viewers.count) as view_to_purchase_rate FROM page_viewers, cart_adders, purchasers;"
+    "instruction": "List all document templates created in the last month.",
+    "input": "Database has tables: cre_Doc_Template_Mgt.Templates(Template_ID, Template_Type_Code, Template_Name, Creation_Date, Last_Modified_Date), cre_Doc_Template_Mgt.Documents(Document_ID, Template_ID, Document_Name, Document_Description, Document_Creation_Date)",
+    "output": "SELECT t.Template_Name, COUNT(d.Document_ID) as usage_count FROM cre_Doc_Template_Mgt.Templates t LEFT JOIN cre_Doc_Template_Mgt.Documents d ON t.Template_ID = d.Template_ID WHERE t.Creation_Date >= DATE('now', '-1 month') GROUP BY t.Template_ID, t.Template_Name;"
   },
   {
-    "instruction": "Find the most common browser and operating system combinations for mobile users.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId, date), device(deviceCategory, browser, operatingSystem, isMobile)",
-    "output": "SELECT d.browser, d.operatingSystem, COUNT(*) as session_count FROM ga_sessions s JOIN device d ON s.visitId = d.visitId WHERE d.deviceCategory = 'mobile' GROUP BY d.browser, d.operatingSystem ORDER BY session_count DESC LIMIT 10;"
-  },
-  {
-    "instruction": "Compute the average order value by traffic source for customers who have made at least 3 purchases.",
-    "input": "Database has tables: ga_sessions(fullVisitorId, visitId), trafficSource(source, medium, campaign), transactions(transactionId, visitId, totalTransactionRevenue)",
-    "output": "WITH customer_purchase_counts AS (SELECT s.fullVisitorId, COUNT(DISTINCT t.transactionId) as purchase_count FROM ga_sessions s JOIN transactions t ON s.visitId = t.visitId GROUP BY s.fullVisitorId HAVING COUNT(DISTINCT t.transactionId) >= 3) SELECT ts.source, AVG(t.totalTransactionRevenue / 1000000) as avg_order_value FROM ga_sessions s JOIN trafficSource ts ON s.visitId = ts.visitId JOIN transactions t ON s.visitId = t.visitId JOIN customer_purchase_counts cpc ON s.fullVisitorId = cpc.fullVisitorId GROUP BY ts.source ORDER BY avg_order_value DESC;"
-  },
-  {
-    "instruction": "Identify seasonal trends in product sales by comparing quarterly revenue for each product category over the past two years.",
-    "input": "Database has tables: orders(id, order_date, total_amount), order_items(order_id, product_id, quantity, item_price), products(id, name, category_id), categories(id, name)",
-    "output": "WITH quarterly_sales AS (SELECT c.name as category, EXTRACT(YEAR FROM o.order_date) as year, EXTRACT(QUARTER FROM o.order_date) as quarter, SUM(oi.quantity * oi.item_price) as quarterly_revenue FROM categories c JOIN products p ON c.id = p.category_id JOIN order_items oi ON p.id = oi.product_id JOIN orders o ON oi.order_id = o.id WHERE o.order_date >= DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 years' GROUP BY c.name, EXTRACT(YEAR FROM o.order_date), EXTRACT(QUARTER FROM o.order_date)) SELECT qs1.category, qs1.quarter, qs1.quarterly_revenue as current_year_revenue, qs2.quarterly_revenue as previous_year_revenue, ((qs1.quarterly_revenue - qs2.quarterly_revenue) / qs2.quarterly_revenue) * 100 as yoy_growth_percentage FROM quarterly_sales qs1 JOIN quarterly_sales qs2 ON qs1.category = qs2.category AND qs1.quarter = qs2.quarter AND qs1.year = qs2.year + 1 ORDER BY qs1.category, qs1.quarter;"
-  },
-  {
-    "instruction": "Find all chess games where a player achieved checkmate in less than 20 moves.",
-    "input": "Database has tables: chess_games(id, white_player_id, black_player_id, date, result, moves, ply_count), players(id, name, country, elo_rating)",
-    "output": "SELECT g.id, wp.name as white_player, bp.name as black_player, g.moves, g.ply_count FROM chess_games g JOIN players wp ON g.white_player_id = wp.id JOIN players bp ON g.black_player_id = bp.id WHERE (g.result = '1-0' OR g.result = '0-1') AND g.ply_count < 40 AND g.moves LIKE '%#' ORDER BY g.ply_count ASC;"
-  },
-  {
-    "instruction": "For each patient, find their most commonly prescribed medication and the total cost of all their prescriptions.",
-    "input": "Database has tables: patients(id, name, dob, gender), prescriptions(id, patient_id, medication_id, dosage, date_prescribed, refills), medications(id, name, category, cost_per_unit)",
-    "output": "WITH med_counts AS (SELECT p.id as patient_id, m.id as medication_id, m.name as medication_name, COUNT(*) as prescription_count, ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY COUNT(*) DESC) as rank FROM patients p JOIN prescriptions pr ON p.id = pr.patient_id JOIN medications m ON pr.medication_id = m.id GROUP BY p.id, m.id, m.name) SELECT p.name as patient_name, mc.medication_name as most_common_medication, mc.prescription_count, SUM(m.cost_per_unit * pr.dosage * (pr.refills + 1)) as total_medication_cost FROM patients p JOIN med_counts mc ON p.id = mc.patient_id AND mc.rank = 1 JOIN prescriptions pr ON p.id = pr.patient_id JOIN medications m ON pr.medication_id = m.id GROUP BY p.name, mc.medication_name, mc.prescription_count ORDER BY total_medication_cost DESC;"
-  },
-  {
-    "instruction": "Calculate the win-loss record for each NBA team during the 2021-2022 season, including home and away performance.",
-    "input": "Database has tables: games(id, home_team_id, away_team_id, home_score, away_score, date, season), teams(id, name, city, conference)",
-    "output": "WITH team_games AS (SELECT t.id, t.name, g.id as game_id, CASE WHEN g.home_team_id = t.id THEN 'home' ELSE 'away' END as location, CASE WHEN (g.home_team_id = t.id AND g.home_score > g.away_score) OR (g.away_team_id = t.id AND g.away_score > g.home_score) THEN 1 ELSE 0 END as is_win FROM teams t JOIN games g ON t.id = g.home_team_id OR t.id = g.away_team_id WHERE g.season = '2021-2022') SELECT tg.name as team_name, COUNT(*) as games_played, SUM(tg.is_win) as wins, COUNT(*) - SUM(tg.is_win) as losses, ROUND(SUM(tg.is_win) * 100.0 / COUNT(*), 1) as win_percentage, SUM(CASE WHEN tg.location = 'home' THEN tg.is_win ELSE 0 END) as home_wins, SUM(CASE WHEN tg.location = 'home' THEN 1 - tg.is_win ELSE 0 END) as home_losses, SUM(CASE WHEN tg.location = 'away' THEN tg.is_win ELSE 0 END) as away_wins, SUM(CASE WHEN tg.location = 'away' THEN 1 - tg.is_win ELSE 0 END) as away_losses FROM team_games tg GROUP BY tg.id, tg.name ORDER BY win_percentage DESC;"
-  },
-  {
-    "instruction": "Identify anomalous login activity by finding users who have logged in from more than 3 different countries within a 24-hour period.",
-    "input": "Database has tables: users(id, username, email), login_events(id, user_id, timestamp, ip_address, country, city, device_type, success)",
-    "output": "WITH daily_login_locations AS (SELECT user_id, DATE(timestamp) as login_date, COUNT(DISTINCT country) as country_count FROM login_events WHERE success = true GROUP BY user_id, DATE(timestamp) HAVING COUNT(DISTINCT country) > 3) SELECT u.username, dll.login_date, dll.country_count, STRING_AGG(DISTINCT le.country, ', ') as countries FROM daily_login_locations dll JOIN users u ON dll.user_id = u.id JOIN login_events le ON dll.user_id = le.user_id AND DATE(le.timestamp) = dll.login_date WHERE le.success = true GROUP BY u.username, dll.login_date, dll.country_count ORDER BY dll.login_date DESC, dll.country_count DESC;"
-  },
-  {
-    "instruction": "Find the top 5 universities with the highest percentage of international students.",
-    "input": "Database has tables: universities(id, name, location, founded_year, type), students(id, university_id, name, nationality, enrollment_year, major_id), majors(id, name, department)",
-    "output": "WITH student_counts AS (SELECT u.id, u.name, COUNT(*) as total_students, SUM(CASE WHEN s.nationality != SUBSTRING(u.location, POSITION(',' IN u.location) + 1) THEN 1 ELSE 0 END) as international_students FROM universities u JOIN students s ON u.id = s.university_id GROUP BY u.id, u.name) SELECT name, total_students, international_students, ROUND((international_students * 100.0 / total_students), 2) as international_percentage FROM student_counts ORDER BY international_percentage DESC LIMIT 5;"
-  },
-  {
-    "instruction": "Analyze the effect of weather conditions on restaurant sales by comparing average daily revenue on rainy days versus sunny days.",
-    "input": "Database has tables: restaurants(id, name, cuisine, location), sales(id, restaurant_id, date, total_revenue, customer_count), weather(date, location, condition, temperature, precipitation)",
-    "output": "WITH daily_sales AS (SELECT r.id, r.name, s.date, w.condition, s.total_revenue FROM restaurants r JOIN sales s ON r.id = s.restaurant_id JOIN weather w ON s.date = w.date AND r.location = w.location) SELECT name, AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) as avg_revenue_rainy_days, AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END) as avg_revenue_sunny_days, (AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) - AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END)) as revenue_difference, ((AVG(CASE WHEN condition = 'Rainy' THEN total_revenue END) - AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END)) / AVG(CASE WHEN condition = 'Sunny' THEN total_revenue END) * 100) as percentage_difference FROM daily_sales GROUP BY id, name ORDER BY percentage_difference;"
-  },
-  {
-    "instruction": "Create a report showing the monthly active users (MAU) and daily active users (DAU) ratio for a mobile app over the past year.",
-    "input": "Database has tables: users(id, username, registration_date), app_sessions(id, user_id, session_start, session_end, device_type)",
-    "output": "WITH daily_users AS (SELECT DATE(session_start) as activity_date, COUNT(DISTINCT user_id) as dau FROM app_sessions WHERE session_start >= CURRENT_DATE - INTERVAL '1 year' GROUP BY DATE(session_start)), monthly_users AS (SELECT DATE_TRUNC('month', session_start) as month, COUNT(DISTINCT user_id) as mau FROM app_sessions WHERE session_start >= CURRENT_DATE - INTERVAL '1 year' GROUP BY DATE_TRUNC('month', session_start)) SELECT TO_CHAR(m.month, 'YYYY-MM') as month, m.mau, ROUND(AVG(d.dau), 2) as avg_dau, ROUND(AVG(d.dau) * 100.0 / m.mau, 2) as dau_mau_ratio FROM monthly_users m JOIN daily_users d ON d.activity_date BETWEEN m.month AND (m.month + INTERVAL '1 month' - INTERVAL '1 day') GROUP BY m.month, m.mau ORDER BY m.month;"
-  },
-  {
-    "instruction": "Generate a query that calculates the lifetime value (LTV) of customers segmented by their acquisition channel.",
-    "input": "Database has tables: customers(id, name, email, acquisition_channel, acquisition_date), orders(id, customer_id, order_date, total_amount, status)",
-    "output": "WITH customer_value AS (SELECT c.id, c.acquisition_channel, SUM(CASE WHEN o.status != 'cancelled' THEN o.total_amount ELSE 0 END) as lifetime_value, DATEDIFF(MAX(o.order_date), MIN(o.order_date)) / 365.0 as customer_lifespan_years FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id, c.acquisition_channel HAVING COUNT(o.id) > 0) SELECT acquisition_channel, COUNT(*) as customer_count, ROUND(AVG(lifetime_value), 2) as avg_lifetime_value, ROUND(MAX(lifetime_value), 2) as max_lifetime_value, ROUND(MIN(lifetime_value), 2) as min_lifetime_value, ROUND(AVG(customer_lifespan_years), 2) as avg_customer_lifespan, ROUND(AVG(lifetime_value) / AVG(customer_lifespan_years), 2) as avg_annual_value FROM customer_value GROUP BY acquisition_channel ORDER BY avg_lifetime_value DESC;"
+    "instruction": "Find all flights departing after 5pm.",
+    "input": "Database has tables: flight_2.airline(uid, airline, abbreviation, country), flight_2.flight(flno, origin, destination, departure_date, arrival_date, aid, pilot), flight_2.airport(city, code, country)",
+    "output": "SELECT f.flno, a1.city as origin_city, a2.city as destination_city, f.departure_date FROM flight_2.flight f JOIN flight_2.airport a1 ON f.origin = a1.code JOIN flight_2.airport a2 ON f.destination = a2.code WHERE SUBSTR(f.departure_date, 12, 5) > '17:00';"
   }
 ]
