@@ -387,11 +387,6 @@ def compare_results(result1, result2):
     return set(tuple(row) for row in result1) == set(tuple(row) for row in result2)
 
 def process_spider_dataset(model, tokenizer, spider_dir, output_dir="spider_results", batch_size=4):
-    """
-    Process the Spider dataset and generate SQL predictions in the format expected by the
-    original Spider evaluation script (evaluation.py).
-    """
-    # Set CUDA optimizations
     torch.backends.cudnn.benchmark = True
     
     # Create output directory if it doesn't exist
