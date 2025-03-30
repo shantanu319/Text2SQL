@@ -1,27 +1,17 @@
 {
   "predictions": [
-    "select count(*) from singer",
-    "select name from instructor where id in (select distinct t1.id from teaches as t1 join professor as t2 on t1.id = t2.id)",
-    "select name , country , age from singer order by age desc",
-    "select name , country , age from singer order by age desc",
-    "select avg(age) , min(age) , max(age) from singer where country = \"france\"",
-    "select avg(age) , min(age) , max(age) from singer where country = \"france\"",
-    "select t2.title , t2.year from singer as t1 join song as t2 on t1.singer_id = t2.singer_id order by t1.age limit 1",
-    "select t2.name , t2.year from singer as t1 join song as t2 on t1.singer_id = t2.singer_id where t1.age = (select min(age) from singer)",
-    "select distinct country from singer where age > 20",
-    "select distinct country from singer where age > 20"
+    "select name from track",
+    "select t1.customer_name from customers join",
+    "select t1.name from student as t1 join lives_in as t2 on t1.id = t2.student_id join dorm as t3 on t2.dormid = t3.id where t3.room_type = 'luxury'",
+    "select distinct t1.name from instructor as t1 join class as t2 on t1.id = t2.prof where t2.class_code in (select t3.prereq_class_code from prereq as t3)",
+    "select count(*) , city from list group by city"
   ],
   "gold": [
     "SELECT count(*) FROM singer\tconcert_singer",
     "SELECT count(*) FROM singer\tconcert_singer",
     "SELECT name ,  country ,  age FROM singer ORDER BY age DESC\tconcert_singer",
     "SELECT name ,  country ,  age FROM singer ORDER BY age DESC\tconcert_singer",
-    "SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'\tconcert_singer",
-    "SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'\tconcert_singer",
-    "SELECT song_name ,  song_release_year FROM singer ORDER BY age LIMIT 1\tconcert_singer",
-    "SELECT song_name ,  song_release_year FROM singer ORDER BY age LIMIT 1\tconcert_singer",
-    "SELECT DISTINCT country FROM singer WHERE age  >  20\tconcert_singer",
-    "SELECT DISTINCT country FROM singer WHERE age  >  20\tconcert_singer"
+    "SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'\tconcert_singer"
   ],
   "error": "Command '['/usr/bin/python3', '/home/ubuntu/ShantanuK/txt2sql_461/spider/evaluation.py', '--gold', 'spider_results/gold_spider.sql', '--pred', 'spider_results/pred_spider.sql', '--etype', 'all', '--db', '/home/ubuntu/ShantanuK/txt2sql_461/spider/database']' returned non-zero exit status 1."
 }

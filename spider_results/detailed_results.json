@@ -1,0 +1,32 @@
+[
+  {
+    "db_id": "concert_singer",
+    "question": "How many singers do we have?",
+    "gold_query": "SELECT count(*) FROM singer",
+    "predicted_query": "SELECT Campus FROM Campuses WHERE Location=\"Northridge\" AND County=\"Los Angeles\" UNION SELECT Campus FROM Campuses WHERE Location=\"San Francisco\" AND County=\"San Francisco\""
+  },
+  {
+    "db_id": "concert_singer",
+    "question": "What is the total number of singers?",
+    "gold_query": "SELECT count(*) FROM singer",
+    "predicted_query": "SELECT Campus FROM Campuses WHERE Location=\"Northridge\" AND County=\"Los Angeles\" UNION SELECT Campus FROM Campuses WHERE Location=\"San Francisco\" AND County=\"San Francisco\""
+  },
+  {
+    "db_id": "concert_singer",
+    "question": "Show name, country, age for all singers ordered by age from the oldest to the youngest.",
+    "gold_query": "SELECT name ,  country ,  age FROM singer ORDER BY age DESC",
+    "predicted_query": "SELECT Campus FROM Campuses WHERE Location=\"Northridge\" AND County=\"Los Angeles\" UNION SELECT Campus FROM Campuses WHERE Location=\"San Francisco\" AND County=\"San Francisco\""
+  },
+  {
+    "db_id": "concert_singer",
+    "question": "What are the names, countries, and ages for every singer in descending order of age?",
+    "gold_query": "SELECT name ,  country ,  age FROM singer ORDER BY age DESC",
+    "predicted_query": "SELECT Campus FROM Campuses WHERE Location=\"Northridge\" AND County=\"Los Angeles\" UNION SELECT Campus FROM Campuses WHERE Location=\"San Francisco\" AND County=\"San Francisco\""
+  },
+  {
+    "db_id": "concert_singer",
+    "question": "What is the average, minimum, and maximum age of all singers from France?",
+    "gold_query": "SELECT avg(age) ,  min(age) ,  max(age) FROM singer WHERE country  =  'France'",
+    "predicted_query": "SELECT Campus FROM Campuses WHERE Location=\"Northridge\" AND County=\"Los Angeles\" UNION SELECT Campus FROM Campuses WHERE Location=\"San Francisco\" AND County=\"San Francisco\""
+  }
+]

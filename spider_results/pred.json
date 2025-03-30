@@ -1,0 +1,202 @@
+[
+  {
+    "query": "SELECT count(*) FROM singer",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM singer",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name , Country , Age FROM singer ORDER BY Age DESC",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name , Country , Age FROM singer ORDER BY Age DESC",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT avg(Age) , min(Age) , max(Age) FROM singer WHERE Country = \"France\"",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT avg(Age) , min(Age) , max(Age) FROM singer WHERE Country = \"France\"",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Song_Name , Song_release_year FROM singer ORDER BY Age ASC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Song_Name , Song_release_year FROM singer JOIN concert_song ON singer.Singer_ID = concert_song.Singer_ID WHERE Age = ( SELECT min(Age) FROM singer )",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT DISTINCT Country FROM singer WHERE Age > 20",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT DISTINCT country FROM singer WHERE Age > 20",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Country , count(*) FROM singer GROUP BY Country",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) , Country FROM singer GROUP BY Country",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Song_Name FROM singer WHERE Age > (SELECT avg(Age) FROM singer)",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Song_Name FROM singer WHERE Age > (SELECT avg(Age) FROM singer)",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Location , Name FROM stadium WHERE Capacity >= 5000 AND Capacity <= 10000",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Location , Name FROM stadium WHERE Capacity BETWEEN 5000 AND 10000",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT max(Capacity) , avg(Capacity) FROM stadium",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT avg(Capacity) , max(Capacity) FROM stadium",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name , Capacity FROM stadium ORDER BY Average DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name , Capacity FROM stadium ORDER BY Average DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM concert WHERE YEAR = '2014' OR YEAR = '2015'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM concert WHERE YEAR = '2014' OR YEAR = '2015'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T2.Name , count(*) FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Stadium_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) , T1.Name FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID GROUP BY T1.Name",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T2.Name , T2.Capacity FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Year >= 2014 GROUP BY T1.Stadium_ID ORDER BY count(*) DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name , T1.Capacity FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Year > 2013 GROUP BY T1.Stadium_ID ORDER BY count(*) DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Year FROM concert GROUP BY Year ORDER BY count(*) DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT YEAR FROM concert GROUP BY YEAR ORDER BY count(*) DESC LIMIT 1",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name FROM stadium EXCEPT SELECT T2.Name FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name FROM stadium EXCEPT SELECT T2.Name FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Country FROM singer WHERE Age > 40 INTERSECT SELECT Country FROM singer WHERE Age < 30",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT name FROM STADIUM EXCEPT SELECT T1.name FROM STADIUM AS T1 JOIN CONCERT AS T2 ON T1.stadium_id = T2.stadium_id WHERE T2.year = 2014",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name FROM stadium EXCEPT SELECT T1.Name FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Year = 2014",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Concert_Name , T1.Theme , count(*) FROM concert AS T1 JOIN singer_in_concert AS T2 ON T1.Concert_ID = T2.Concert_ID GROUP BY T1.Concert_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name , T2.Theme , count(*) FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID JOIN singer_in_concert AS T3 ON T2.concert_ID = T3.concert_ID GROUP BY T2.concert_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name , count(*) FROM singer AS T1 JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID GROUP BY T2.Singer_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T2.Name , count(*) FROM singer_in_concert AS T1 JOIN singer AS T2 ON T1.Singer_ID = T2.Singer_ID GROUP BY T1.Singer_ID",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T2.Name FROM concert AS T1 JOIN singer AS T2 ON T1.concert_ID = T2.Singer_ID WHERE T1.Year = '2014'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name FROM singer AS T1 JOIN singer_in_concert AS T2 ON T1.Singer_ID = T2.Singer_ID JOIN concert AS T3 ON T2.concert_ID = T3.concert_ID WHERE T3.Year = 2014",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name , T1.Country FROM singer AS T1 JOIN concert_song AS T2 ON T1.Singer_ID = T2.Singer_ID WHERE T2.Song_name LIKE '%Hey%'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT Name , Country FROM singer WHERE Song_Name LIKE '%Hey%'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T1.Name , T1.Location FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Year = '2014' INTERSECT SELECT T1.Name , T1.Location FROM stadium AS T1 JOIN concert AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T2.Year = '2015'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT T2.Name , T2.Location FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Year = '2014' INTERSECT SELECT T2.Name , T2.Location FROM concert AS T1 JOIN stadium AS T2 ON T1.Stadium_ID = T2.Stadium_ID WHERE T1.Year = '2015'",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM concert WHERE Stadium_ID = (SELECT Stadium_ID FROM stadium ORDER BY Capacity DESC LIMIT 1)",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id = T2.stadium_id WHERE T2.capacity = (SELECT max(capacity) FROM stadium)",
+    "db_id": "concert_singer"
+  },
+  {
+    "query": "SELECT count(*) FROM Pets WHERE weight > 10",
+    "db_id": "pets_1"
+  },
+  {
+    "query": "SELECT count(*) FROM Pets WHERE weight > 10",
+    "db_id": "pets_1"
+  },
+  {
+    "query": "SELECT T1.weight FROM Pets AS T1 JOIN Has_Pet AS T2 ON T1.PetID = T2.PetID WHERE T1.PetType = \"dog\" ORDER BY T1.pet_age LIMIT 1",
+    "db_id": "pets_1"
+  },
+  {
+    "query": "SELECT weight FROM PETS WHERE pet_age = (SELECT min(pet_age) FROM PETS WHERE pet_type = \"dog\")",
+    "db_id": "pets_1"
+  },
+  {
+    "query": "SELECT max(weight) , PetType FROM Pets GROUP BY PetType",
+    "db_id": "pets_1"
+  }
+]
