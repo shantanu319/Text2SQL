@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/home/ubuntu/ShantanuK/txt2sql_461/Spider2/spider2-snow/evaluation_suite/evaluate.py", line 415, in <module>
-    evaluate_spider2sql(args)
-  File "/home/ubuntu/ShantanuK/txt2sql_461/Spider2/spider2-snow/evaluation_suite/evaluate.py", line 230, in evaluate_spider2sql
-    spider2sql_metadata = load_jsonl_to_dict("../spider2-snow.jsonl")
-  File "/home/ubuntu/ShantanuK/txt2sql_461/Spider2/spider2-snow/evaluation_suite/evaluate.py", line 45, in load_jsonl_to_dict
-    with open(jsonl_file, 'r') as file:
-FileNotFoundError: [Errno 2] No such file or directory: '../spider2-snow.jsonl'
