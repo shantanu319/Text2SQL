@@ -2,7 +2,7 @@
 
 General Approach: Finetuning a model by inserting detailed database schema into the question-answer pairs provided in the training data.
 
-This repository needs to be cleaned up. The files to care about are: balanced_spider_finetune.jsonl (the data), different_approach_ftdata.py, qwen_setup.py (finetunes and performs inference, generating queries), and convert_to_text.py (converts the predicted queries from JSON to text format for compatability with the evaluation suite).
+This repository needs to be cleaned up. The files to care about are: balanced_spider_finetune.jsonl (the data), different_approach_ftdata.py (takes the basic QA training data and generates the schemas, building the training file in a Qwen-friendly format), qwen_setup.py (finetunes and performs inference, generating queries), and convert_to_text.py (converts the predicted queries from JSON to text format for compatability with the evaluation suite).
 
 To run this on your own, you need to clone the Spider repo: https://github.com/taoyds/spider, clone the evaluation suite: https://github.com/taoyds/test-suite-sql-eval, and download the dataset: https://tinyurl.com/spider1db.
 
