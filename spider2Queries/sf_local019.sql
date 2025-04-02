@@ -1,1 +1,0 @@
-SELECT T1.wrestler_name, T2.wrestler_name FROM nxt_titles AS T1 INNER JOIN nxt_wrestlers AS T2 ON T1.wrestler_id = T2.id WHERE T1.title_change != 'title change' ORDER BY LENGTH(T1.match) ASC LIMIT 2;
