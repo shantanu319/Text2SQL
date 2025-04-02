@@ -1,4 +1,4 @@
-# txt2sql_461
+# Text to SQL with Small Models
 
 General Approach: Finetuning a model by inserting detailed database schema into the question-answer pairs provided in the training data.
 
